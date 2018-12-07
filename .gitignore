@@ -1,0 +1,27 @@
+# 
+# NOTE: if you have any other project file in any different location, please 
+#       add them to a .gitignore file
+
+#ignore the database
+*database.db
+
+#ignore Visual Studio project files
+.vs
+x64
+
+*.vcxproj
+*.vcxproj.*
+
+#ignore Qt project files
+*.pro.user
+
+build-Application-Desktop_Qt_5_11_1_MSVC2017_64bit-Debug/
+
+[Dd]ebug
+[Rr]elease
+[Bb]in
+[Oo]bj
+[Ll]og
+
+Debug/
+config/
