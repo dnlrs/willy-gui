@@ -1,6 +1,6 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
-#include "chartview.h"
+#include "chartView.h"
 #include <QLineEdit>
 #include <QHBoxLayout>
 #include <QRect>
