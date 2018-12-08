@@ -34,7 +34,8 @@ SOURCES += \
     chartview.cpp \
     dlctimer.cpp \
     istochart.cpp \
-    confwdg.cpp
+    confwdg.cpp \
+    logwdg.cpp
 
 HEADERS += \
         mainwindow.h \
@@ -43,7 +44,8 @@ HEADERS += \
     chartview.h \
     dlctimer.h \
     istochart.h \
-    confwdg.h
+    confwdg.h \
+    logwdg.h
 
 FORMS += \
         mainwindow.ui \

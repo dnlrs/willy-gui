@@ -6,6 +6,7 @@
 #include <QRect>
 #include <QSpinBox>
 
+
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
@@ -30,7 +31,7 @@ void MainWindow::on_actionExit_triggered()
 
 void MainWindow::on_actionShow_Logs_triggered()
 {
-
+    log.show();
 }
 
 void MainWindow::on_actionConfiguration_triggered()

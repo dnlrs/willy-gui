@@ -2,7 +2,9 @@
 #define MAINWINDOW_H
 
 #include <confwdg.h>
+#include <logwdg.h>
 #include <QMainWindow>
+#include <QProcess>
 
 namespace Ui {
 class MainWindow;
@@ -28,6 +30,8 @@ private slots:
 private:
     Ui::MainWindow *ui;
     confwdg wdg;
+    logwdg log;
+    QProcess* server;
 };
 
 #endif // MAINWINDOW_H
