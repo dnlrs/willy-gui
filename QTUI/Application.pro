@@ -32,22 +32,23 @@ SOURCES += \
     position.cpp \
     device.cpp \
     chartview.cpp \
-    dlctimer.cpp \
     istochart.cpp \
     confwdg.cpp \
-    logwdg.cpp
+    logwdg.cpp \
+    macstats.cpp \
+    lastwindow.cpp
 
 HEADERS += \
         mainwindow.h \
     position.h \
     device.h \
     chartview.h \
-    dlctimer.h \
     istochart.h \
     confwdg.h \
-    logwdg.h
+    logwdg.h \
+    macstats.h \
+    lastwindow.h
 
 FORMS += \
         mainwindow.ui \
-    mainwindow.ui \
-    confwindow.ui
+    mainwindow.ui

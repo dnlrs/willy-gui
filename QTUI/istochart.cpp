@@ -21,204 +21,57 @@
 
 QT_CHARTS_USE_NAMESPACE
 
-istochart::istochart(QWidget *parent) :
+istochart::istochart(QWidget *parent, QString mac, time_t beg, time_t ending) :
     QChartView(parent)
 {
-    interval = time (NULL);
-    slider=false;
-    stat=false;
-    spinSlider=false;
-    beginning = time(NULL);
+    QSqlQuery qry;
+    QString query;
+    int k=0;
+    int n=0;
     QTextStream out(stdout);
-    device dev;
     setRenderHint(QPainter::Antialiasing);
-
-    timer = new QTimer(this);
-        connect(timer, SIGNAL(timeout()), this, SLOT(updateChart()));
-        timer->start(1000);
-
+    out << "ISTOCHART CREATO" << endl;
+    int end= static_cast<int>(ending);
+    int begg= static_cast<int>(beg);
+    QVariant qv= end-begg;
     m_scatter = new QLineSeries;
     chart()->addSeries(m_scatter);
     chart()->legend()->markers(m_scatter)[0]->setVisible(false);
     chart()->createDefaultAxes();
-    chart()->axisX()->setRange(0, 10); //todo inserire costante giusta
-    chart()->axisY()->setRange(0, 3);
-}
-
-void istochart::updateChart(){
-    m_scatter->clear();
-    QSqlQuery qry;
-    QMap<int, int> countXtimestamp;
-    QTextStream out(stdout);
-    QString query;
-    if(!slider){
-        if(stat){
-            query="SELECT timestamp, count(DISTINCT mac) AS counting FROM positions GROUP BY timestamp";
-            //WHERE timestamp<" +
-            //(QString::number(interval) + " AND timestamp>" +
-            //QString::number(beginning) + "GROUP BY timestamp";
+    chart()->axisX()->setRange(0, qv);
+    chart()->axisY()->setRange(0, 1);
+    for(int i=begg; i<end; i++){
+        query= "SELECT * FROM devices WHERE mac="+ mac +" AND timestamp="+ i;
+        if (qry.exec(query))
+        {
+           if(qry.first())
+           {
+               k++;
+               n++;
+               if(k==3){
+                *m_scatter << QPointF( i, 1);
+               }
+               if(n==5){
+                n=0;
+                k=0;
+               }
+           }
+           else {
+               n++;
+               if(n==5){
+                *m_scatter << QPointF( i, 0);
+                n=0;
+                k=0;
+               }
+           }
         }
-        else{
-            if(timetravel){
-                beginning++;
-                if(beginning>interval){
-                    int tmp=beginning;
-                    beginning=interval;
-                    interval=tmp;
-                    spinSlider=false;
-                    timetravel=false;
-                }
-                query = "SELECT timestamp, count(DISTINCT mac) AS counting FROM positions GROUP BY timestamp";
-                                //WHERE timestamp<" +
-                                //(QString::number(beginning)+300) + " AND timestamp>" +
-                                //QString::number(beginning) GROUP BY timestamp;
-            }
-            else{
-                time_t now = time(NULL);
-                query = "SELECT timestamp, count(DISTINCT mac) AS counting FROM positions GROUP BY timestamp";
-                                //WHERE timestamp<" +
-                                //(QString::number(beginning)+300) + " AND timestamp>" +
-                                //QString::number(beginning);
-                if(interval>now){
-                    resetDisplay();
-                }
-                beginning= now;
-
-                if(reset){
-                    resetDisplay();
-                    reset=false;
-                }
-            }
+        else
+        {
+            qDebug() << qry.lastError();
         }
     }
-    else{
-        query= "SELECT timestamp, count(DISTINCT mac) AS counting FROM positions GROUP BY timestamp";
-                        //WHERE timestamp<" +
-                        //QString::number(interval) + " AND timestamp>" +
-                        //QString::number(beginning);
-    }
-    if (qry.exec(query))
-    {
-       while(qry.next())
-       {
-           //out << "valori delle query" << endl;
-           //out << qry.value(0).toInt() << endl;
-           //out << qry.value(1).toInt() << endl;
-           countXtimestamp.insert(qry.value(0).toInt(), qry.value(1).toInt());
-       }
-    }
-    else
-    {
-        qDebug() << qry.lastError();
-    }
-    int k=0;
-    QMap<int, int>::const_iterator i = countXtimestamp.constBegin();
-    while (i != countXtimestamp.constEnd()){
-        k++;
-        *m_scatter << QPointF( (time(NULL)-beginning+k), i.value());
-        //out << "valori delle chiavi" << endl;
-        //out << time(NULL)- beginning+k << endl;
-        //out << i.value() << endl;
-         ++i;
-    }
-    stat=false;
-    slider=false;
-    countXtimestamp.clear();
 }
-
-void istochart::myRestart()
-{
-    interval=time(NULL);
-    beginning=time(NULL);
-    updateChart();
-    QTextStream out(stdout);
-    out << "timer started." << endl;
-    timer->start();
-}
-
-void istochart::myStop()
-{
-    timer->stop();
-    QTextStream out(stdout);
-    out << "timer stopped." << endl;
-}
-
-void istochart::myChangeValue(int val)
-{
-    timer->stop();
-    if(!spinSlider){
-        interval-= val;
-        if(interval==time(NULL)){
-            resetDisplay();
-            reset=false;
-        }
-    }
-    else
-        beginning-=val;
-    if(beginning>interval){
-        int tmp= beginning;
-        beginning=interval;
-        interval=tmp;
-        spinSlider=true;
-    }
-    if(interval<time(NULL) && spinSlider){
-        timetravel=true;
-        reset=true;
-    }
-    slider=true;
-    updateChart();
-}
-
-void istochart::myChangeValue2(int val)
-{
-    timer->stop();
-    if(!spinSlider){
-        interval+= val;
-        if(interval==time(NULL))
-            resetDisplay();
-            reset=false;
-    }
-    else{
-        beginning+=val;
-    }
-    if(beginning>interval){
-        int tmp= beginning;
-        beginning=interval;
-        interval=tmp;
-        spinSlider=false;
-    }
-    slider=true;
-    updateChart();
-}
-
-void istochart::myStats(){
-    beginning= statStart.toTime_t();
-    interval= statStop.toTime_t();
-    QTextStream out(stdout);
-    timer->stop();
-    out << beginning << endl;
-    out << interval << endl;
-    stat=true;
-    updateChart();
-}
-
-void istochart::myStart()
-{
-    timer->start();
-}
-
-void istochart::myStatsStart(QDateTime time)
-{
-    statStart= time;
-}
-
-void istochart::myStatsStop(QDateTime time)
-{
-    statStop=time;
-}
-
 istochart::~istochart()
 {
 
 }
-

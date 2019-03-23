@@ -17,12 +17,12 @@ logwdg::logwdg(QWidget *parent) : QMainWindow(parent)
 
     this->server = new QProcess(this);
     this->server->setWorkingDirectory("..\\server");
-    out<< server->pid() << endl;
+    //out<< server->pid() << endl;
     connect(this->server, SIGNAL(readyReadStandardOutput()), this, SLOT(processOutput()));  // connect process signals with your code
     connect(this->server, SIGNAL(readyReadStandardError()), this, SLOT(processOutput()));  // same here
     server->start("..\\server\\wifi_watchdog_analyzer.exe");
-    out<< server->pid() << endl;
-    out << server->state() << endl;
+    //out<< server->pid() << endl;
+    //out << server->state() << endl;
 }
 
 logwdg::~logwdg()
@@ -34,6 +34,6 @@ void logwdg::processOutput()
 {
     edit->append( server->readAllStandardOutput());
     edit->append( server->readAllStandardError());
-    qDebug() << server->readAllStandardOutput();  // read normal output
-    qDebug() << server->readAllStandardError();  // read error channel
+    //qDebug() << server->readAllStandardOutput();  // read normal output
+    //qDebug() << server->readAllStandardError();  // read error channel
 }

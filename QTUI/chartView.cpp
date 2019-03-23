@@ -6,7 +6,6 @@
 #include <QtSql/QSqlError>
 #include <QtCore/QString>
 #include <QLegendMarker>
-#include <QTimer>
 #include <time.h>
 #include <sstream>
 #include <QtCharts/QChartGlobal>
@@ -24,31 +23,12 @@ QT_CHARTS_USE_NAMESPACE
 chartview::chartview(QWidget *parent) :
     QChartView(parent)
 {
-    chartview::interval = time (NULL);
-    slider=false;
-    stat=false;
-    spinSlider=false;
-    beginning = time(NULL);
     QTextStream out(stdout);
     float maxX=0;
     float maxY=0;
     device dev;
     setRenderHint(QPainter::Antialiasing);
-    timer = new QTimer(this);
-        connect(timer, SIGNAL(timeout()), this, SLOT(updateChart()));
-        timer->start(1000);
-
-    QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE");
-        //db.setHostName("http://localhost/phpmyadmin");
-        db.setDatabaseName("C:/Users/TheCreator/Documents/UIPositions/timestamp_positions.db");
-        //db.setUserName("");
-        //db.setPassword("");
-        bool ok = db.open();
-        if(!ok){
-             out << "not connected" << endl;
-        }
     QSqlQuery qry;
-
     if (qry.exec("SELECT * FROM devices"))
     {
        while(qry.next())
@@ -71,7 +51,6 @@ chartview::chartview(QWidget *parent) :
             maxY=d.getX();
         }
     }
-
     m_scatter = new QScatterSeries();
     chart()->addSeries(m_scatter);
     chart()->legend()->markers(m_scatter)[0]->setVisible(false);
@@ -99,7 +78,7 @@ void chartview::handleClickedPoint(const QPointF &point)
             closest = currentPoint;
         }
     }
-    QString query= "SELECT * FROM positions WHERE x==" +
+    QString query= "SELECT * FROM devices WHERE x==" +
                     QString::number(closest.x()) + " AND y==" +
                     QString::number(closest.y());
     QTextStream out(stdout);
@@ -113,11 +92,11 @@ void chartview::handleClickedPoint(const QPointF &point)
          label->setText("MAC: "+ qry.value(0).toString() +".\n"
                         "X: "+ qry.value(1).toString() +".\n"
                         "Y: "+ qry.value(2).toString() +".\n"
-                        "RSSI: "+ qry.value(3).toString() +".\n"
-                        "SSID: "+ qry.value(4).toString() +".\n"
-                        "MAC: "+ qry.value(5).toString() +".\n"
-                        "TIMESTAMP: "+ qry.value(6).toString() +".\n"
-                        "SEQUENCE NUMBER: "+ qry.value(7).toString() +".\n");
+                        //"RSSI: "+ qry.value(3).toString() +".\n"
+                        //"SSID: "+ qry.value(4).toString() +".\n"
+                        //"MAC: "+ qry.value(5).toString() +".\n"
+                        "TIMESTAMP: "+ qry.value(3).toString() +".\n");
+                        //"SEQUENCE NUMBER: "+ qry.value(7).toString() +".\n");
     }
     else
     {
@@ -127,183 +106,49 @@ void chartview::handleClickedPoint(const QPointF &point)
     wdg->show();
 }
 
-void chartview::updateChart(){
+void chartview::updateChart(time_t beginning, time_t end){
     m_scatter->clear();
-    QSqlQuery qry;
+    QSqlQuery qry, qry2;
     position p;
     QTextStream out(stdout);
     QString query;
-    if(!slider){
-        if(stat){
-            query="SELECT * FROM positions";
-            //WHERE timestamp<" +
-            //QString::number(chartView::interval) + " AND timestamp>" +
-            //QString::number(chartView::beginning);
-        }
-        else{
-            if(timetravel){
-                beginning++;
-                if(beginning>interval){
-                    int tmp=beginning;
-                    beginning=interval;
-                    interval=tmp;
-                    spinSlider=false;
-                    timetravel=false;
-                }
-                query = "SELECT * FROM positions";
-                                //WHERE timestamp<" +
-                                //QString::number(interval) + " AND timestamp>" +
-                                //QString::number(ChartView::beginning);
-            }
-            else{
-                time_t now = time(NULL);
-                query = "SELECT * FROM positions";
-                                //WHERE timestamp<" +
-                                //QString::number(now) + " AND timestamp>" +
-                                //QString::number(ChartView::beginning);
-                if(interval>now){
-                    resetDisplay();
-                }
-                chartview::interval= now;
+    query="SELECT * FROM devices WHERE timestamp<" +QString::number(end) + " AND timestamp>" + QString::number(beginning);
 
-                if(reset){
-                    resetDisplay();
-                    reset=false;
-                }
-            }
-        }
-    }
-    else{
-        query= "SELECT * FROM positions";
-                        //WHERE timestamp<" +
-                        //QString::number(interval) + " AND timestamp>" +
-                        //QString::number(ChartView::beginning);
-    }
-    QDateTime datetime;
-    datetime.setTime_t(beginning);
-    QString s = datetime.toString("yyyy-MM-dd  HH:mm:ss");
-    updated(s);
-    datetime.setTime_t(interval);
-    s= datetime.toString("yyyy-MM-dd  HH:mm:ss");
-    updatedFine(s);
     if (qry.exec(query))
     {
        while(qry.next())
        {
-            p.setHash(qry.value(0).toString());
-            p.setX(qry.value(1).toFloat());
-            p.setY(qry.value(2).toFloat());
-            p.setRssi(qry.value(3).toInt());
-            p.setSsid(qry.value(4).toString());
-            p.setMac(qry.value(5).toString());
-            //ChartView::positions[i].setChannel(qry.value(6).toInt());
-            p.setTimestamp(qry.value(7).toInt());
-            p.setSequence_number(qry.value(8).toInt());
-            positions.push_back(p);
+            query="SELECT * FROM packets WHERE mac=" + qry.value(0).toString() + "AND timestamp=" + qry.value(3).toString();
+            if (qry2.exec(query))
+            {
+               if(qry2.first())
+               {
+                    p.setHash(qry2.value(0).toString());
+                    p.setX(qry.value(1).toFloat());
+                    p.setY(qry.value(2).toFloat());
+                    p.setRssi(qry2.value(3).toInt());
+                    p.setSsid(qry2.value(4).toString());
+                    p.setMac(qry2.value(5).toString());
+                    //ChartView::positions[i].setChannel(qry.value(6).toInt());
+                    p.setTimestamp(qry2.value(7).toInt());
+                    p.setSequence_number(qry2.value(8).toInt());
+                    positions.push_back(p);
+                }
+            }
+            else
+            {
+                qDebug() << qry2.lastError() << "\t" << query;
+            }
        }
     }
     else
     {
-        qDebug() << qry.lastError();
+        qDebug() << qry.lastError()<< "\t" << query;
     }
     for(position p : positions){
         *m_scatter << QPointF( p.position::getX(), p.position::getY());
-
     }
-    stat=false;
-    slider=false;
     positions.clear();
-}
-
-void chartview::myRestart()
-{
-    interval=time(NULL);
-    beginning=time(NULL);
-    updateChart();
-    QTextStream out(stdout);
-    out << "timer started." << endl;
-    timer->start();
-}
-
-void chartview::myStop()
-{
-    timer->stop();
-    QTextStream out(stdout);
-    out << "timer stopped." << endl;
-}
-
-void chartview::myChangeValue(int val)
-{
-    timer->stop();
-    if(!spinSlider){
-        interval-= val;
-        if(interval==time(NULL)){
-            resetDisplay();
-            reset=false;
-        }
-    }
-    else
-        beginning-=val;
-    if(beginning>interval){
-        int tmp= beginning;
-        beginning=interval;
-        interval=tmp;
-        spinSlider=true;
-    }
-    if(interval<time(NULL) && spinSlider){
-        timetravel=true;
-        reset=true;
-    }
-    slider=true;
-    updateChart();
-}
-
-void chartview::myChangeValue2(int val)
-{
-    timer->stop();
-    if(!spinSlider){
-        interval+= val;
-        if(interval==time(NULL))
-            resetDisplay();
-            reset=false;
-    }
-    else{
-        beginning+=val;
-    }
-    if(beginning>interval){
-        int tmp= beginning;
-        beginning=interval;
-        interval=tmp;
-        spinSlider=false;
-    }
-    slider=true;
-    updateChart();
-}
-
-void chartview::myStats(){
-    chartview::beginning= chartview::statStart.toTime_t();
-    interval= chartview::statStop.toTime_t();
-    QTextStream out(stdout);
-    timer->stop();
-    out << beginning << endl;
-    out << interval << endl;
-    stat=true;
-    updateChart();
-}
-
-void chartview::myStart()
-{
-    timer->start();
-}
-
-void chartview::myStatsStart(QDateTime time)
-{
-    statStart= time;
-}
-
-void chartview::myStatsStop(QDateTime time)
-{
-    statStop=time;
 }
 
 chartview::~chartview()
