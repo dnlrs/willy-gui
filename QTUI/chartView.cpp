@@ -112,7 +112,7 @@ void chartview::updateChart(time_t beginning, time_t end){
     position p;
     QTextStream out(stdout);
     QString query;
-    query="SELECT * FROM devices WHERE timestamp<" +QString::number(end) + " AND timestamp>" + QString::number(beginning);
+    query="SELECT DISTINCT mac, pos_x , pos_y FROM devices WHERE timestamp<" +QString::number(end) + " AND timestamp>" + QString::number(beginning)+" GROUP BY mac HAVING MAX(timestamp)";
 
     if (qry.exec(query))
     {

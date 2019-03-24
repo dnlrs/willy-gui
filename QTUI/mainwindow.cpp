@@ -121,25 +121,29 @@ void MainWindow::statStartChange(QDateTime time){
 void MainWindow::statistiche()
 {
     timer->stop();
+    if( ui->startTime->dateTime().toTime_t() < ui->endTime->dateTime().toTime_t()){
+        beginning= ui->startTime->dateTime().toTime_t();
+        end= ui->endTime->dateTime().toTime_t();
+        QDateTime datetime;
+        datetime.setTime_t(beginning);
+        QString s = datetime.toString("yyyy-MM-dd  HH:mm:ss");
+        ui->inizio->display(s);
+        datetime.setTime_t(end);
+        s = datetime.toString("yyyy-MM-dd  HH:mm:ss");
+        ui->fine->display(s);
 
-    beginning= ui->startTime->dateTime().toTime_t();
-    end= ui->endTime->dateTime().toTime_t();
-    QDateTime datetime;
-    datetime.setTime_t(beginning);
-    QString s = datetime.toString("yyyy-MM-dd  HH:mm:ss");
-    ui->inizio->display(s);
-    datetime.setTime_t(end);
-    s = datetime.toString("yyyy-MM-dd  HH:mm:ss");
-    ui->fine->display(s);
-
-    ui->comboBox->setEnabled(true);
-    ui->pushButton_3->setEnabled(false);
-    ui->spinBox->setEnabled(true);
-    ui->spinBox_2->setEnabled(true);
-    ui->spinBox_3->setEnabled(true);
-    ui->spinBox_4->setEnabled(true);
-    ui->spinBox_5->setEnabled(true);
-    ui->spinBox_6->setEnabled(true);
+        ui->comboBox->setEnabled(true);
+        ui->pushButton_3->setEnabled(false);
+        ui->spinBox->setEnabled(true);
+        ui->spinBox_2->setEnabled(true);
+        ui->spinBox_3->setEnabled(true);
+        ui->spinBox_4->setEnabled(true);
+        ui->spinBox_5->setEnabled(true);
+        ui->spinBox_6->setEnabled(true);
+    }
+    else {
+        ui->label_16->setText("Il datetime di inizio deve essere\n minore di quello di fine.");
+    }
 }
 
 void MainWindow::restart()
@@ -157,10 +161,15 @@ void MainWindow::restart()
 void MainWindow::mminizio(int mm)
 {
     QDateTime datetime;
-    beginning+= (mm*60);
-    datetime.setTime_t(beginning);
-    QString s = datetime.toString("yyyy-MM-dd  HH:mm:ss");
-    ui->inizio->display(s);
+    if(beginning+(mm*60)<end){
+        beginning+= (mm*60);
+        datetime.setTime_t(beginning);
+        QString s = datetime.toString("yyyy-MM-dd  HH:mm:ss");
+        ui->inizio->display(s);
+    }
+    else{
+        ui->label_16->setText("Inizio periodo precedente\n alla fine.");
+    }
     ui->spinBox->setValue(0);
     ui->spinBox_2->setValue(0);
     ui->spinBox_3->setValue(0);
@@ -172,10 +181,16 @@ void MainWindow::mminizio(int mm)
 void MainWindow::mmfine(int mm)
 {
     QDateTime datetime;
-    end+= (mm*60);
-    datetime.setTime_t(end);
-    QString s = datetime.toString("yyyy-MM-dd  HH:mm:ss");
-    ui->fine->display(s);
+    if(end+(mm*60)>beginning){
+        end+= (mm*60);
+        datetime.setTime_t(end);
+        QString s = datetime.toString("yyyy-MM-dd  HH:mm:ss");
+        ui->fine->display(s);
+    }
+    else
+    {
+        ui->label_16->setText("Inizio precedente\n a fine.");
+    }
     ui->spinBox->setValue(0);
     ui->spinBox_2->setValue(0);
     ui->spinBox_3->setValue(0);
@@ -188,10 +203,15 @@ void MainWindow::mmfine(int mm)
 void MainWindow::gginizio(int gg)
 {
     QDateTime datetime;
-    beginning+= (gg*86400);
-    datetime.setTime_t(beginning);
-    QString s = datetime.toString("yyyy-MM-dd  HH:mm:ss");
-    ui->inizio->display(s);
+    if(beginning + (gg*86400)<end){
+        beginning+= (gg*86400);
+        datetime.setTime_t(beginning);
+        QString s = datetime.toString("yyyy-MM-dd  HH:mm:ss");
+        ui->inizio->display(s);
+    }
+    else {
+        ui->label_16->setText("Periodo di inizio precedente\n a fine");
+    }
     ui->spinBox->setValue(0);
     ui->spinBox_2->setValue(0);
     ui->spinBox_3->setValue(0);
@@ -203,10 +223,14 @@ void MainWindow::gginizio(int gg)
 void MainWindow::ggfine(int gg)
 {
     QDateTime datetime;
-    end+= (gg*86400);
-    datetime.setTime_t(end);
-    QString s = datetime.toString("yyyy-MM-dd  HH:mm:ss");
-    ui->fine->display(s);
+    if(end + (gg*86400)>beginning){
+        end+= (gg*86400);
+        datetime.setTime_t(end);
+        QString s = datetime.toString("yyyy-MM-dd  HH:mm:ss");
+        ui->fine->display(s);
+    }else {
+        ui->label_16->setText("Periodo di inizio precedente\n a fine.");
+    }
     ui->spinBox->setValue(0);
     ui->spinBox_2->setValue(0);
     ui->spinBox_3->setValue(0);
@@ -218,10 +242,15 @@ void MainWindow::ggfine(int gg)
 void MainWindow::hhinizio(int hh)
 {
     QDateTime datetime;
-    beginning+= (hh*3600);
-    datetime.setTime_t(beginning);
-    QString s = datetime.toString("yyyy-MM-dd  HH:mm:ss");
-    ui->inizio->display(s);
+    if(beginning+(hh*3600)<end){
+        beginning+= (hh*3600);
+        datetime.setTime_t(beginning);
+        QString s = datetime.toString("yyyy-MM-dd  HH:mm:ss");
+        ui->inizio->display(s);
+    }
+    else{
+        ui->label_16->setText("Periodi inizio precedente\n a periodo fine");
+    }
     ui->spinBox->setValue(0);
     ui->spinBox_2->setValue(0);
     ui->spinBox_3->setValue(0);
@@ -233,10 +262,15 @@ void MainWindow::hhinizio(int hh)
 void MainWindow::hhfine(int hh)
 {
     QDateTime datetime;
-    end+= (hh*3600);
-    datetime.setTime_t(end);
-    QString s = datetime.toString("yyyy-MM-dd  HH:mm:ss");
-    ui->fine->display(s);
+    if(end+(hh*3600)>beginning){
+        end+= (hh*3600);
+        datetime.setTime_t(end);
+        QString s = datetime.toString("yyyy-MM-dd  HH:mm:ss");
+        ui->fine->display(s);
+    }
+    else{
+        ui->label_16->setText("Periodo inizio precedente\n a periodo fine.");
+    }
     ui->spinBox->setValue(0);
     ui->spinBox_2->setValue(0);
     ui->spinBox_3->setValue(0);
@@ -268,6 +302,7 @@ void MainWindow::on_actionImport_Positions_triggered()
 
 void MainWindow::on_actionExit_triggered()
 {
+
     close();
 }
 
