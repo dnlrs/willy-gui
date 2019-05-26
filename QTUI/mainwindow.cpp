@@ -28,7 +28,7 @@ MainWindow::MainWindow(QWidget *parent) :
     sliderValue=0;
     QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE");
     //db.setHostName("http://localhost/phpmyadmin");
-    db.setDatabaseName("C:/Users/TheCreator/timestamp_positions.db");
+    db.setDatabaseName("C:/Users/aiman/Desktop/wifi_watchdog_analyzer_gui/server/database.db");
     //db.setUserName("");
     //db.setPassword("");
     bool ok = db.open();
@@ -59,6 +59,7 @@ void MainWindow::update(){
     ui->chartView->updateChart(beginning, end);
     ui->comboBox->update(beginning, end);
     ui->graphicsView->updateChart(beginning, end);
+
 }
 
 void MainWindow::sliderManagment(int newVal){
@@ -131,6 +132,9 @@ void MainWindow::statistiche()
         datetime.setTime_t(end);
         s = datetime.toString("yyyy-MM-dd  HH:mm:ss");
         ui->fine->display(s);
+        ui->chartView->updateChart(beginning, end);
+        ui->comboBox->update(beginning, end);
+        ui->graphicsView->updateChart(beginning, end);
 
         ui->comboBox->setEnabled(true);
         ui->pushButton_3->setEnabled(false);

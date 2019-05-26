@@ -24,8 +24,8 @@ chartview::chartview(QWidget *parent) :
     QChartView(parent)
 {
     QTextStream out(stdout);
-    float maxX=0;
-    float maxY=0;
+    double maxX=0;
+    double maxY=0;
     device dev;
     setRenderHint(QPainter::Antialiasing);
     QSqlQuery qry;
@@ -33,9 +33,9 @@ chartview::chartview(QWidget *parent) :
     {
        while(qry.next())
        {
-           dev.setX(qry.value(1).toFloat());
+           dev.setX(qry.value(2).toDouble());
            dev.setId(qry.value(0).toInt());
-           dev.setY(qry.value(2).toFloat());
+           dev.setY(qry.value(3).toDouble());
            devices.push_back(dev);
        }
     }
@@ -48,7 +48,7 @@ chartview::chartview(QWidget *parent) :
             maxX=d.getX();
         }
         if(d.getY()>maxY){
-            maxY=d.getX();
+            maxY=d.getY();
         }
     }
     m_scatter = new QScatterSeries();
@@ -78,8 +78,8 @@ void chartview::handleClickedPoint(const QPointF &point)
             closest = currentPoint;
         }
     }
-    QString query= "SELECT * FROM devices WHERE x==" +
-                    QString::number(closest.x()) + " AND y==" +
+    QString query= "SELECT * FROM devices WHERE pos_x==" +
+                    QString::number(closest.x()) + " AND pos_y==" +
                     QString::number(closest.y());
     QTextStream out(stdout);
     out << query << endl;
@@ -112,13 +112,17 @@ void chartview::updateChart(time_t beginning, time_t end){
     position p;
     QTextStream out(stdout);
     QString query;
-    query="SELECT DISTINCT mac, pos_x , pos_y FROM devices WHERE timestamp<" +QString::number(end) + " AND timestamp>" + QString::number(beginning)+" GROUP BY mac HAVING MAX(timestamp)";
-
+    const QDateTime dtbeg = QDateTime::fromTime_t( beginning );
+    const QString textbeg = QString::number(beginning);
+    const QDateTime dtend = QDateTime::fromTime_t( end );
+    const QString textend = QString::number(end);
+    query="SELECT DISTINCT mac, pos_x , pos_y, timestamp FROM devices WHERE timestamp<"+textend+" AND timestamp>"+textbeg+" GROUP BY mac HAVING MAX(timestamp)";
+    qDebug() <<  "\t" << query;
     if (qry.exec(query))
     {
        while(qry.next())
        {
-            query="SELECT * FROM packets WHERE mac=" + qry.value(0).toString() + "AND timestamp=" + qry.value(3).toString();
+            query="SELECT * FROM packets WHERE mac=" + qry.value(0).toString() + " AND timestamp=" + qry.value(3).toString();
             if (qry2.exec(query))
             {
                if(qry2.first())

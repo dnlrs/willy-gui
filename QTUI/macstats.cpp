@@ -25,7 +25,8 @@ void macstats::update(time_t start, time_t end)
     QSqlQuery qry;
     QTextStream out(stdout);
 
-    if (qry.exec("SELECT distinct mac FROM devices WHERE timestamp<=" + QString::number(end) + " AND timestamp>="+ QString::number(start)))
+    //if (qry.exec("SELECT distinct mac FROM devices WHERE timestamp<=" + QString::number(end) + " AND timestamp>="+ QString::number(start)))
+    if (qry.exec("SELECT distinct mac FROM devices WHERE timestamp<=1557929701  AND timestamp>=1557928733"))
     {
        while(qry.next())
        {
