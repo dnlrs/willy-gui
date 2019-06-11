@@ -59,6 +59,7 @@ confwdg::~confwdg()
 
 }
 
+// TODO: change configuration reading/writing
 void confwdg::configurationclicked()
 {
     QString fileName = "C:/Users/aiman/Desktop/wifi_watchdog_analyzer_gui/server/config/configuration.txt";

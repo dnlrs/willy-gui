@@ -50,12 +50,12 @@ void position::setSsid(const QString &value)
     ssid = value;
 }
 
-int position::getMac() const
+long long position::getMac() const
 {
     return mac;
 }
 
-void position::setMac(int value)
+void position::setMac(long long value)
 {
     mac = value;
 }

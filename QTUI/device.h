@@ -1,21 +1,24 @@
 #ifndef DEVICE_H
 #define DEVICE_H
 
+#include <string>
 
 class device
 {
 private:
-    int id;
+    long long id;
     double x;
     double y;
 public:
     device();
-    int getId() const;
-    void setId(int value);
+    long long getId() const;
+    void setId(long long value);
     double getX() const;
     void setX(double value);
     double getY() const;
     void setY(double value);
+
+    static std::string mac2str(long long addr);
 };
 
 #endif // DEVICE_H

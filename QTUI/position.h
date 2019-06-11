@@ -11,7 +11,7 @@ private:
     float y;
     int rssi;
     QString ssid;
-    int mac;
+    long long mac;
     int channel;
     int timestamp;
     int sequence_number;
@@ -28,8 +28,8 @@ public:
     void setRssi(int value);
     QString getSsid() const;
     void setSsid(const QString &value);
-    int getMac() const;
-    void setMac(int);
+    long long getMac() const;
+    void setMac(long long);
     int getChannel() const;
     void setChannel(int value);
     int getTimestamp() const;

@@ -8,6 +8,8 @@
 #include <QLegendMarker>
 #include <time.h>
 #include <sstream>
+#include <algorithm>
+#include <utility>
 #include <QtCharts/QChartGlobal>
 #include <QtCharts/QChartView>
 #include <QtCharts/QScatterSeries>
@@ -34,7 +36,7 @@ chartview::chartview(QWidget *parent) :
        while(qry.next())
        {
            dev.setX(qry.value(2).toDouble());
-           dev.setId(qry.value(0).toInt());
+           dev.setId(qry.value(0).toLongLong());
            dev.setY(qry.value(3).toDouble());
            devices.push_back(dev);
        }
@@ -93,13 +95,13 @@ void chartview::handleClickedPoint(const QPointF &point)
             datetime.setTime_t(p.getTimestamp());
             QString s = datetime.toString("yyyy-MM-dd  HH:mm:ss");
 
-            label->setText("MAC:  "+QString::number(p.getMac())+".\n"
-                           "X: "+ QString::number(p.getX()) +".\n"
-                           "Y: "+ QString::number(p.getY()) +".\n"
-                           "RSSI: "+ QString::number(p.getRssi()) +".\n"
-                           "SSID: "+ p.getSsid() +".\n"
-                           "TIMESTAMP: "+ s +".\n"
-                           "SEQUENCE NUMBER: "+ QString::number(p.getSequence_number()) +".\n");
+            label->setText("MAC:  "+ QString::fromStdString(device::mac2str(p.getMac()))+"\n"
+                           "X: "+ QString::number(p.getX()) +"\n"
+                           "Y: "+ QString::number(p.getY()) +"\n"
+                           "RSSI: "+ QString::number(p.getRssi()) +"\n"
+                           "SSID: "+ p.getSsid() +"\n"
+                           "TIMESTAMP: "+ s +"\n"
+                           "SEQUENCE NUMBER: "+ QString::number(p.getSequence_number()) +"\n");
         }
     }
 
@@ -132,23 +134,27 @@ void chartview::handleClickedPoint2(const QPointF &point)
             QDateTime datetime;
             datetime.setTime_t(p.getTimestamp());
             QString s = datetime.toString("yyyy-MM-dd  HH:mm:ss");
-            std::list<std::pair<float, int>> probableMatching;
+            std::list<std::pair<float, long long>> probableMatching;
             probableMatching = chartview::probableHiddenMatching(p, hiddenCollection);
-            probableMatching.sort();
+            
+            /* sort in reverse order (descending) */
+            probableMatching.sort([](const std::pair<float, long long>& p1, const std::pair<float, long long>& p2) -> bool {
+                return (p1.first > p2.first);
+            });
             size_t n = 3;
             auto listEnd= std::next(probableMatching.begin(), std::min(n, probableMatching.size()));
-            std::list<std::pair<float, int>> max3(probableMatching.begin(), listEnd);
+            std::list<std::pair<float, long long>> max3(probableMatching.begin(), listEnd);
             QString myString = "";
-            for(std::pair<float, int> pai : max3){
-                myString+= QString::number(pai.second) +": "+QString::number(pai.first) +"%\n";
+            for(std::pair<float, long long> pai : max3){
+                myString+= QString::fromStdString(device::mac2str(pai.second)) +": "+QString::number(pai.first) +"%\n";
             }
-            label->setText("MAC: "+QString::number(p.getMac()) +".\n"
-                           "X: "+ QString::number(p.getX()) +".\n"
-                           "Y: "+ QString::number(p.getY()) +".\n"
-                           "RSSI: "+ QString::number(p.getRssi()) +".\n"
-                           "SSID: "+ p.getSsid() +".\n"
-                           "TIMESTAMP: "+ s +".\n"
-                           "SEQUENCE NUMBER: "+ QString::number(p.getSequence_number()) +".\n"
+            label->setText("MAC: "+QString::fromStdString(device::mac2str(p.getMac())) +"\n"
+                           "X: "+ QString::number(p.getX()) +"\n"
+                           "Y: "+ QString::number(p.getY()) +"\n"
+                           "RSSI: "+ QString::number(p.getRssi()) +"\n"
+                           "SSID: "+ p.getSsid() +"\n"
+                           "TIMESTAMP: "+ s +"\n"
+                           "SEQUENCE NUMBER: "+ QString::number(p.getSequence_number()) +"\n"
                            "-*-*-*-*-*-*-*-PROBLABLE MATCHING-*-*-*-*-*-*-*-\n"+myString
                            );
         }
@@ -185,7 +191,7 @@ void chartview::updateChart(time_t beginning, time_t end){
                     p.setY(qry.value(2).toFloat());
                     p.setRssi(qry2.value(2).toInt());
                     p.setSsid(qry2.value(1).toString());
-                    p.setMac(qry2.value(3).toInt());
+                    p.setMac(qry2.value(3).toLongLong());
                     //ChartView::positions[i].setChannel(qry.value(6).toInt());
                     p.setTimestamp(qry2.value(6).toInt());
                     p.setSequence_number(qry2.value(5).toInt());
@@ -224,13 +230,13 @@ void chartview::updateChart(time_t beginning, time_t end){
     hiddenPositions.clear();
 }
 
-std::list<std::pair<float, int>> chartview::probableHiddenMatching( position p, std::vector<position> hiddenCollections){
+std::list<std::pair<float, long long>> chartview::probableHiddenMatching( position p, std::vector<position> hiddenCollections){
 
     const static int SSID_WEIGHT = 50;
     const static int POS_WEIGHT = 30;
     const static int SEQ_WEIGHT = 19;
 
-    std::list<std::pair<float, int>> resultList;
+    std::list<std::pair<float, long long>> resultList;
     float curr_weight;
 
     for(position px : hiddenCollections){
@@ -246,7 +252,7 @@ std::list<std::pair<float, int>> chartview::probableHiddenMatching( position p, 
         if((p.getSequence_number() - px.getSequence_number() > 0) && p.getSequence_number() - px.getSequence_number() < 10)
             curr_weight += SEQ_WEIGHT;
 
-        std::pair<int, float> pai;
+        std::pair<float, long long> pai;
         pai.second = px.getMac();
         pai.first = curr_weight;
         resultList.push_back(pai);
