@@ -6,16 +6,16 @@ class device
 {
 private:
     int id;
-    float x;
-    float y;
+    double x;
+    double y;
 public:
     device();
     int getId() const;
     void setId(int value);
-    float getX() const;
-    void setX(float value);
-    float getY() const;
-    void setY(float value);
+    double getX() const;
+    void setX(double value);
+    double getY() const;
+    void setY(double value);
 };
 
 #endif // DEVICE_H

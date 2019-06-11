@@ -21,7 +21,6 @@ public:
     ~MainWindow();
 
 private slots:
-    void on_actionImport_Positions_triggered();
 
     void on_actionExit_triggered();
 

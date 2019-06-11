@@ -12,6 +12,7 @@
 #include <QtSql/QSqlDatabase>
 #include <QtSql/QSqlQuery>
 #include <QtSql/QSqlError>
+#include <QDir>
 
 
 MainWindow::MainWindow(QWidget *parent) :
@@ -28,7 +29,7 @@ MainWindow::MainWindow(QWidget *parent) :
     sliderValue=0;
     QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE");
     //db.setHostName("http://localhost/phpmyadmin");
-    db.setDatabaseName("C:/Users/TheCreator/timestamp_positions.db");
+    db.setDatabaseName("../server/database.db");
     //db.setUserName("");
     //db.setPassword("");
     bool ok = db.open();
@@ -43,6 +44,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->startTime->setDateTime(datetime);
     ui->inizio->display(s);
     ui->fine->display(s);
+    out << QDir::currentPath() << endl;
     ui->comboBox->update(this->beginning, this->end);
     timer = new QTimer(this);
         connect(timer, SIGNAL(timeout()), this, SLOT(update()));
@@ -59,6 +61,7 @@ void MainWindow::update(){
     ui->chartView->updateChart(beginning, end);
     ui->comboBox->update(beginning, end);
     ui->graphicsView->updateChart(beginning, end);
+
 }
 
 void MainWindow::sliderManagment(int newVal){
@@ -109,7 +112,8 @@ void MainWindow::swapMode(){
 
 void MainWindow::statStartChange(QDateTime time){
     QDateTime datetime;
-    datetime.setTime_t(end);
+    datetime = ui->endTime->dateTime();
+    //datetime.setTime_t(end);
     if(datetime> time){
         ui->pushButton->setEnabled(true);
     }
@@ -131,6 +135,9 @@ void MainWindow::statistiche()
         datetime.setTime_t(end);
         s = datetime.toString("yyyy-MM-dd  HH:mm:ss");
         ui->fine->display(s);
+        ui->chartView->updateChart(beginning, end);
+        ui->comboBox->update(beginning, end);
+        ui->graphicsView->updateChart(beginning, end);
 
         ui->comboBox->setEnabled(true);
         ui->pushButton_3->setEnabled(false);
@@ -166,6 +173,8 @@ void MainWindow::mminizio(int mm)
         datetime.setTime_t(beginning);
         QString s = datetime.toString("yyyy-MM-dd  HH:mm:ss");
         ui->inizio->display(s);
+        ui->startTime->setDateTime(datetime);
+
     }
     else{
         ui->label_16->setText("Inizio periodo precedente\n alla fine.");
@@ -186,6 +195,8 @@ void MainWindow::mmfine(int mm)
         datetime.setTime_t(end);
         QString s = datetime.toString("yyyy-MM-dd  HH:mm:ss");
         ui->fine->display(s);
+        ui->endTime->setDateTime(datetime);
+
     }
     else
     {
@@ -208,6 +219,7 @@ void MainWindow::gginizio(int gg)
         datetime.setTime_t(beginning);
         QString s = datetime.toString("yyyy-MM-dd  HH:mm:ss");
         ui->inizio->display(s);
+        ui->startTime->setDateTime(datetime);
     }
     else {
         ui->label_16->setText("Periodo di inizio precedente\n a fine");
@@ -228,6 +240,8 @@ void MainWindow::ggfine(int gg)
         datetime.setTime_t(end);
         QString s = datetime.toString("yyyy-MM-dd  HH:mm:ss");
         ui->fine->display(s);
+        ui->endTime->setDateTime(datetime);
+
     }else {
         ui->label_16->setText("Periodo di inizio precedente\n a fine.");
     }
@@ -247,6 +261,8 @@ void MainWindow::hhinizio(int hh)
         datetime.setTime_t(beginning);
         QString s = datetime.toString("yyyy-MM-dd  HH:mm:ss");
         ui->inizio->display(s);
+        ui->startTime->setDateTime(datetime);
+
     }
     else{
         ui->label_16->setText("Periodi inizio precedente\n a periodo fine");
@@ -267,6 +283,7 @@ void MainWindow::hhfine(int hh)
         datetime.setTime_t(end);
         QString s = datetime.toString("yyyy-MM-dd  HH:mm:ss");
         ui->fine->display(s);
+        ui->endTime->setDateTime(datetime);
     }
     else{
         ui->label_16->setText("Periodo inizio precedente\n a periodo fine.");
@@ -281,7 +298,8 @@ void MainWindow::hhfine(int hh)
 
 void MainWindow::statStopChange(QDateTime time){
     QDateTime datetime;
-    datetime.setTime_t(beginning);
+    //datetime.setTime_t(beginning);
+    datetime = ui->startTime->dateTime();
     if(!(datetime> time)){
         ui->pushButton->setEnabled(true);
     }
@@ -293,11 +311,6 @@ void MainWindow::statStopChange(QDateTime time){
 MainWindow::~MainWindow()
 {
     delete ui;
-}
-
-void MainWindow::on_actionImport_Positions_triggered()
-{
-
 }
 
 void MainWindow::on_actionExit_triggered()

@@ -37,6 +37,7 @@ lastwindow::lastwindow(QWidget *parent) :
 }
 
 void lastwindow::updateChart(time_t beginning, time_t end){
+    m_scatter -> clear();
     int intervalnum=(end-beginning)/300;
     chart()->axisX()->setRange(0, intervalnum);
     QSqlQuery qry;
@@ -50,7 +51,7 @@ void lastwindow::updateChart(time_t beginning, time_t end){
         numsDevices.insert(1000,0);
     }
     query="SELECT * FROM devices WHERE timestamp<" +QString::number(end) + " AND timestamp>" + QString::number(beginning);
-
+    qDebug() <<  "\t" << query;
     if (qry.exec(query))
     {
        while(qry.next())
@@ -70,20 +71,22 @@ void lastwindow::updateChart(time_t beginning, time_t end){
         qDebug() << qry.lastError()<< "\t" << query;
     }
     QMapIterator<QString, QList<time_t>> itermap(macsTimes);
+    for(int j=0; j<intervals.size(); j++){
+        numsDevices[j]=0;
+    }
     while(itermap.hasNext())
     {
+       int lastInterval=-1;
        itermap.next();
        bool found=false;
        QList<time_t> tmptimes= itermap.value();
        int k=0;
-       for(int i=0; i<tmptimes.size(); i+=k){
-           for(int j=0; j<intervals.size(); j++){
+       for(int i=0; i<tmptimes.size(); i++){
+           for(int j=0; j<(intervals.size()-1); j++){
                if(tmptimes[i]>intervals[j] && tmptimes[i]<intervals[j+1]){
-                   for(k=i; tmptimes[k]<intervals[j+1]; k++){
-                       if(intervals[j+1]-tmptimes[k]<30){
-                           numsDevices[j+1]++;
-                           break;
-                       }
+                   if(j+1!=lastInterval){
+                            lastInterval=j+1;
+                            numsDevices[j+1]++;
                    }
                    found=true;
                }
@@ -95,6 +98,7 @@ void lastwindow::updateChart(time_t beginning, time_t end){
        }
        //qDebug() << Iter.key() << Iter.value();
     }
+
     for(int i=0; i<intervals.size(); i++){
         *m_scatter << QPointF( i, numsDevices[i]);
     }

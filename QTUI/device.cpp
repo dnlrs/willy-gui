@@ -10,22 +10,22 @@ void device::setId(int value)
     id = value;
 }
 
-float device::getX() const
+double device::getX() const
 {
     return x;
 }
 
-void device::setX(float value)
+void device::setX(double value)
 {
     x = value;
 }
 
-float device::getY() const
+double device::getY() const
 {
     return y;
 }
 
-void device::setY(float value)
+void device::setY(double value)
 {
     y = value;
 }
