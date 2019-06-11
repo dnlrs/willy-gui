@@ -18,15 +18,23 @@ class chartview : public QChartView
 public:
     chartview(QWidget *parent = 0);
     ~chartview();
+    std::list<std::pair<float, int>> probableHiddenMatching(position, std::vector<position>);
 
 public Q_SLOTS:
     void handleClickedPoint(const QPointF &point);
+    void handleClickedPoint2(const QPointF &point);
     void updateChart(time_t, time_t);
 
 private:
     QScatterSeries *m_scatter;
+    QScatterSeries *m_scatter2;
     std::vector<device> devices;
     std::vector<position> positions;
+    std::vector<position> hiddenCollection;
+    std::vector<position> positions2;
+    std::vector<position> hiddenPositions;
+    std::vector<position> hiddenPositions2;
 };
 
 #endif // GRAPHICSVIEW_H
+

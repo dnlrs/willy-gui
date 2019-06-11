@@ -46,6 +46,7 @@ void macstats::showItemStat(const QString & text)
     istochart *isto;
     isto = new istochart(this, text, beginning, interval);
     win->setCentralWidget(isto);
+    win->setFixedSize(500,500);
     win->show();
     out << "cliccato" << endl;
 }

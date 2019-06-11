@@ -7,9 +7,13 @@
 #include <QPushButton>
 #include <QGridLayout>
 #include <QLineEdit>
+#include <QFile>
+#include <QMessageBox>
+
 
 confwdg::confwdg(QWidget *parent) : QMainWindow(parent)
 {
+    devicesNum = 3;
     this->setWindowTitle("Configuration");
     QWidget *wdg = new QWidget(this);
     this->setCentralWidget(wdg);
@@ -57,7 +61,17 @@ confwdg::~confwdg()
 
 void confwdg::configurationclicked()
 {
-
+    QString fileName = "C:/Users/aiman/Desktop/wifi_watchdog_analyzer_gui/server/config/configuration.txt";
+    QFile file(fileName);
+    if (!file.open(QIODevice::ReadWrite)) {
+        return;
+    }
+    QString message = QString::number(devicesNum)+"\n";
+    for(unsigned long long i=0; i<addresses.size(); i++){
+        message+=addresses[i]+" "+QString::number(axx[i])+" "+QString::number(axy[i])+"\n";
+    }
+    QTextStream stream( &file );
+    stream << message << endl;
 }
 
 void confwdg::setMacs(QString text)
@@ -81,12 +95,14 @@ void confwdg::setCords(QString text)
         c.remove("(");
         c.remove(")");
         depuratedCords= c.split(",");
-        axx.push_back(depuratedCords.front().toInt());
-        depuratedCords.pop_front();
-        axy.push_back(depuratedCords.front().toInt());
-        depuratedCords.pop_front();
-        out << axx.front() << endl;
-        out << axy.front() << endl;
+        if(depuratedCords.size()>1){
+            axx.push_back(depuratedCords.front().toInt());
+            depuratedCords.pop_front();
+            axy.push_back(depuratedCords.front().toInt());
+            depuratedCords.pop_front();
+            out << axx.front() << endl;
+            out << axy.front() << endl;
+        }
     }
 }
 
