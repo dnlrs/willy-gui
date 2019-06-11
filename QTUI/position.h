@@ -11,9 +11,9 @@ private:
     float y;
     int rssi;
     QString ssid;
-    QString mac;
+    int mac;
     int channel;
-    float timestamp;
+    int timestamp;
     int sequence_number;
 public:
     position();
@@ -28,12 +28,12 @@ public:
     void setRssi(int value);
     QString getSsid() const;
     void setSsid(const QString &value);
-    QString getMac() const;
-    void setMac(const QString &value);
+    int getMac() const;
+    void setMac(int);
     int getChannel() const;
     void setChannel(int value);
-    float getTimestamp() const;
-    void setTimestamp(float value);
+    int getTimestamp() const;
+    void setTimestamp(int value);
     int getSequence_number() const;
     void setSequence_number(int value);
 };

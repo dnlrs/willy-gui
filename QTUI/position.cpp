@@ -50,12 +50,12 @@ void position::setSsid(const QString &value)
     ssid = value;
 }
 
-QString position::getMac() const
+int position::getMac() const
 {
     return mac;
 }
 
-void position::setMac(const QString &value)
+void position::setMac(int value)
 {
     mac = value;
 }
@@ -70,12 +70,12 @@ void position::setChannel(int value)
     channel = value;
 }
 
-float position::getTimestamp() const
+int position::getTimestamp() const
 {
     return timestamp;
 }
 
-void position::setTimestamp(float value)
+void position::setTimestamp(int value)
 {
     timestamp = value;
 }

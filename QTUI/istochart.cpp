@@ -42,37 +42,42 @@ istochart::istochart(QWidget *parent, QString mac, time_t beg, time_t ending) :
     chart()->createDefaultAxes();
     chart()->axisX()->setRange(0, qv);
     chart()->axisY()->setRange(0, 1);
-    for(int i=0; i<end-begg; i++){
-        QString time  = QString::number(begg+i);
-        query= "SELECT * FROM devices WHERE mac=" + mac.mid(6) +" AND timestamp="+  time;
-        qDebug() << query << "";
-        if (qry.exec(query))
-        {
-           if(qry.first())
-           {
-               //k++;
-               //n++;
-               //if(k==3){
-                *m_scatter << QPointF( i, 1);
-               //}
-               //if(n==5){
-                //n=0;
-                //k=0;
-               //}
-           }
-           else {
-               //n++;
-               //if(n==5){
-                *m_scatter << QPointF( i, 0);
-                //n=0;
-                //k=0;
-               //}
-           }
-        }
-        else
-        {
-            qDebug() << qry.lastError() << query;
-        }
+    QString start  = QString::number(begg);
+    QString stop  = QString::number(end);
+    QList<QString> timestamp;
+    query= "SELECT * FROM devices WHERE mac=" + mac.mid(6) +" AND timestamp>"+  start + " AND timestamp<"+stop;
+    qDebug() << query << "";
+    if (qry.exec(query))
+    {
+        while(qry.next())
+            timestamp.push_back(qry.value(1).toString());
+    }
+    else
+    {
+        qDebug() << qry.lastError() << query;
+    }
+    long diff= end-begg;
+    for(long i=0; i<diff; i++){
+            if(timestamp.contains(QString::number(begg+i)))
+            {
+                //k++;
+                //n++;
+                //if(k==3){
+                 *m_scatter << QPointF( i, 1);
+                //}
+                //if(n==5){
+                 //n=0;
+                 //k=0;
+                //}
+            }
+            else {
+                //n++;
+                //if(n==5){
+                 *m_scatter << QPointF( i, 0);
+                 //n=0;
+                 //k=0;
+                //}
+            }
     }
 }
 istochart::~istochart()
