@@ -18,7 +18,7 @@ class chartview : public QChartView
 public:
     chartview(QWidget *parent = nullptr);
     ~chartview();
-    std::list<std::pair<float, long long>> probableHiddenMatching(position, std::vector<position>);
+    std::list<std::pair<float, long long>> probableHiddenMatching(position, std::vector<position>&);
 
 public Q_SLOTS:
     void handleClickedPoint(const QPointF &point);

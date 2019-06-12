@@ -261,7 +261,7 @@ void chartview::updateChart(time_t beginning, time_t end)
 }
 
 
-std::list<std::pair<float, long long>> chartview::probableHiddenMatching( position p, std::vector<position> hiddenCollections){
+std::list<std::pair<float, long long>> chartview::probableHiddenMatching( position p, std::vector<position>& hiddenCollections){
 
     const static int SSID_WEIGHT = 50;
     const static int POS_WEIGHT = 30;
