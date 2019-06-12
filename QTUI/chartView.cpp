@@ -160,8 +160,6 @@ void chartview::updateChart(time_t beginning, time_t end)
     double xMax = 0;
     double yMax = 0;
 
-
-
     QSqlQuery qry, qry2;
     position p;
 
@@ -170,13 +168,11 @@ void chartview::updateChart(time_t beginning, time_t end)
     const QString textbeg = QString::number(beginning);
     const QString textend = QString::number(end);
 
-    query="SELECT DISTINCT mac, pos_x , pos_y, timestamp "
-          "FROM devices "
-          "WHERE timestamp < \"" + textend + "\" AND timestamp > \"" + textbeg + "\" "
-          "GROUP BY mac "
-          "HAVING MAX(timestamp);";
-
-    qDebug() <<  "\t" << query;
+    query = "SELECT mac as outermac, pos_x, pos_y, timestamp "
+            "FROM devices "
+            "WHERE timestamp = (SELECT MAX(timestamp)"
+                                "FROM devices "
+                                "WHERE mac = outermac AND timestamp <  \"" + textend + "\" AND timestamp >  \"" + textbeg + "\");";
 
     if (qry.exec(query)) {
 
@@ -213,12 +209,12 @@ void chartview::updateChart(time_t beginning, time_t end)
                 }
             }
             else {
-                qDebug() << qry2.lastError() << "\t" << query;
+                qDebug() << qry2.lastError() << "in chartView::updateChart, inner query";
             }
        }
     }
     else {
-        qDebug() << qry.lastError()<< "\t" << query;
+        qDebug() << qry.lastError() << "in chartView::updateChart, outer query";
     }
 
     // update x-Axis max value if needed
@@ -303,7 +299,7 @@ std::list<std::pair<float, long long>> chartview::probableHiddenMatching( positi
 
         consideredMacs.insert(pai.second);
     }
-    qDebug() << "arrivato";
+
     return resultList;
 }
 
