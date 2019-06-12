@@ -50,14 +50,8 @@ void lastwindow::updateChart(time_t start, time_t end)
     unsigned long long intervalNum = (end-start) / interval_width;
     chart()->axes(Qt::Horizontal).first()->setRange(0, intervalNum + 1);
 
-    qDebug("beginning is : %u", start);
-    qDebug("end is : %u", end);
-    qDebug("interval num is: %u", intervalNum);
-
     QVector<int> devicesCount;
     devicesCount.resize(int(intervalNum + 1));
-
-    qDebug("vector size is %d", devicesCount.size());
 
     // read from DB the number of distinc mac for each interval
     QSqlQuery qry;
@@ -72,7 +66,6 @@ void lastwindow::updateChart(time_t start, time_t end)
             int devices = qry.value(1).toInt();
 
             int interval = int((timestamp - start) / interval_width);
-            qDebug("interval from db is: %u", interval);
             devicesCount[interval] += devices;
         }
     }
@@ -98,7 +91,6 @@ void lastwindow::updateChart(time_t start, time_t end)
 
     top_series->clear();
     for (int i = 0; i < int(intervalNum); i++) {
-        qDebug("i is %d", i);
         *top_series << QPointF(i, 0)
                     << QPointF(i, devicesCount[i])
                     << QPointF(i+1, devicesCount[i])
