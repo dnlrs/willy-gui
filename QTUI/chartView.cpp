@@ -165,23 +165,34 @@ void chartview::handleClickedPoint2(const QPointF &point)
 }
 
 void chartview::updateChart(time_t beginning, time_t end){
+
     m_scatter->clear();
     m_scatter2 -> clear();
+
     QSqlQuery qry, qry2;
     position p;
+
     QTextStream out(stdout);
     QString query;
-    const QDateTime dtbeg = QDateTime::fromTime_t( beginning );
+
     const QString textbeg = QString::number(beginning);
-    const QDateTime dtend = QDateTime::fromTime_t( end );
     const QString textend = QString::number(end);
-    query="SELECT DISTINCT mac, pos_x , pos_y, timestamp FROM devices WHERE timestamp<"+textend+" AND timestamp>"+textbeg+" GROUP BY mac HAVING MAX(timestamp)";
-    //qDebug() <<  "\t" << query;
+
+    query="SELECT DISTINCT mac, pos_x , pos_y, timestamp "
+          "FROM devices "
+          "WHERE timestamp < \"" + textend + "\" AND timestamp > \"" + textbeg + "\" "
+          "GROUP BY mac "
+          "HAVING MAX(timestamp);";
+
+    qDebug() <<  "\t" << query;
     if (qry.exec(query))
     {
        while(qry.next())
        {
-            query="SELECT * FROM packets WHERE mac=" + qry.value(0).toString();
+            query="SELECT * "
+                  "FROM packets "
+                  "WHERE mac = \"" + qry.value(0).toString() + "\" AND timestamp = \"" + qry.value(3).toString() + "\";";
+
             if (qry2.exec(query))
             {
                qDebug() << "ENTRATO";
@@ -193,9 +204,9 @@ void chartview::updateChart(time_t beginning, time_t end){
                     p.setRssi(qry2.value(2).toInt());
                     p.setSsid(qry2.value(1).toString());
                     p.setMac(qry2.value(3).toLongLong());
-                    //ChartView::positions[i].setChannel(qry.value(6).toInt());
                     p.setTimestamp(qry2.value(6).toInt());
                     p.setSequence_number(qry2.value(5).toInt());
+
                     if(p.getMac() & (1 << 1)){
                         hiddenPositions.push_back(p);
                     }
@@ -213,9 +224,11 @@ void chartview::updateChart(time_t beginning, time_t end){
     {
         qDebug() << qry.lastError()<< "\t" << query;
     }
+
     for(position p : positions){
         *m_scatter << QPointF( p.position::getX(), p.position::getY());
     }
+
     for(position p : hiddenPositions){
         *m_scatter2 << QPointF( p.position::getX(), p.position::getY());
     }
