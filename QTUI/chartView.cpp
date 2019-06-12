@@ -91,9 +91,10 @@ void chartview::handleClickedPoint(const QPointF &point)
     wdg->resize(400,300);
     QLabel *label= new QLabel(wdg);
     for(position p : positions2){
-        if(p.getX()==closest.x() && p.getY()==closest.y()){
+        if( abs(p.getX() - closest.x()) < 0.001 && abs(p.getY() - closest.y()) < 0.001){
+
             QDateTime datetime;
-            datetime.setTime_t(p.getTimestamp());
+            datetime.setTime_t(uint(p.getTimestamp()));
             QString s = datetime.toString("yyyy-MM-dd  HH:mm:ss");
 
             label->setText("MAC:  "+ QString::fromStdString(device::mac2str(p.getMac()))+"\n"
@@ -131,9 +132,9 @@ void chartview::handleClickedPoint2(const QPointF &point)
     wdg->resize(400,300);
     QLabel *label= new QLabel(wdg);
     for(position p : hiddenPositions2){
-        if(p.getX()==closest.x() && p.getY()==closest.y()){
+        if(abs(p.getX() - closest.x()) < 0.001 && abs(p.getY() - closest.y()) < 0.001){
             QDateTime datetime;
-            datetime.setTime_t(p.getTimestamp());
+            datetime.setTime_t(uint(p.getTimestamp()));
             QString s = datetime.toString("yyyy-MM-dd  HH:mm:ss");
             std::list<std::pair<float, long long>> probableMatching;
             probableMatching = chartview::probableHiddenMatching(p, hiddenCollection);

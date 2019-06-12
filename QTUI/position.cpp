@@ -10,22 +10,22 @@ void position::setHash(const QString &value)
     hash = value;
 }
 
-float position::getX() const
+double position::getX() const
 {
     return x;
 }
 
-void position::setX(float value)
+void position::setX(double value)
 {
     x = value;
 }
 
-float position::getY() const
+double position::getY() const
 {
     return y;
 }
 
-void position::setY(float value)
+void position::setY(double value)
 {
     y = value;
 }
@@ -70,12 +70,12 @@ void position::setChannel(int value)
     channel = value;
 }
 
-int position::getTimestamp() const
+unsigned long long position::getTimestamp() const
 {
     return timestamp;
 }
 
-void position::setTimestamp(int value)
+void position::setTimestamp(unsigned long long value)
 {
     timestamp = value;
 }

@@ -7,23 +7,26 @@ class position
 {
 private:
     QString hash;
-    float x;
-    float y;
+
+    double x;
+    double y;
     int rssi;
+
     QString ssid;
     long long mac;
+
     int channel;
-    int timestamp;
+    unsigned long long timestamp;
     int sequence_number;
 public:
     position();
 
     QString getHash() const;
     void setHash(const QString &value);
-    float getX() const;
-    void setX(float value);
-    float getY() const;
-    void setY(float value);
+    double getX() const;
+    void setX(double value);
+    double getY() const;
+    void setY(double value);
     int getRssi() const;
     void setRssi(int value);
     QString getSsid() const;
@@ -32,8 +35,8 @@ public:
     void setMac(long long);
     int getChannel() const;
     void setChannel(int value);
-    int getTimestamp() const;
-    void setTimestamp(int value);
+    unsigned long long getTimestamp() const;
+    void setTimestamp(unsigned long long value);
     int getSequence_number() const;
     void setSequence_number(int value);
 };
