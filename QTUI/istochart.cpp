@@ -14,6 +14,7 @@
 #include <QtCharts/QLineSeries>
 #include <QMap>
 #include <QTextStream>
+#include <QValueAxis>
 #include <QLabel>
 #include <QSize>
 #include <QPushButton>
@@ -41,6 +42,11 @@ istochart::istochart(QWidget *parent, long long mac_id, QString mac, time_t beg,
     chart()->createDefaultAxes();
     chart()->axes(Qt::Horizontal).first()->setRange(0, qv);
     chart()->axes(Qt::Vertical).first()->setRange(0, 1.2);
+
+    chart()->axes(Qt::Vertical).first()->setTitleText("Presence");
+    chart()->axes(Qt::Horizontal).first()->setTitleText("Time (s)");
+
+    chart()->axes(Qt::Vertical).first()->setLabelsVisible(false);
 
     chart()->setTitle(mac);
 

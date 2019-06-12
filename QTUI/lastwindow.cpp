@@ -6,6 +6,7 @@
 #include <QtSql/QSqlError>
 #include <QtCore/QString>
 #include <QLegendMarker>
+#include <QValueAxis>
 #include <time.h>
 #include <string>
 #include <QtCharts/QChartGlobal>
@@ -34,8 +35,21 @@ lastwindow::lastwindow(QWidget *parent) :
     setRenderHint(QPainter::Antialiasing);
 
     chart()->createDefaultAxes();
-    chart()->axes(Qt::Horizontal).first()->setRange(0, 1);
-    chart()->axes(Qt::Vertical).first()->setRange(0, yAxisMax);
+
+    // setup xAxis
+    QValueAxis *axis = (QValueAxis *) chart()->axes(Qt::Horizontal).first();
+    axis->setRange(0, 1);
+    axis->setLabelFormat("%d");
+    axis->setTitleText("Interval number");
+
+    // setup yAxis
+    axis = (QValueAxis *) chart()->axes(Qt::Vertical).first();
+    axis->setTickType(QValueAxis::TickType::TicksDynamic);
+    axis->setTickAnchor(0);
+    axis->setTickInterval(1);
+    axis->setRange(0, yAxisMax);
+    axis->setLabelFormat("%d");
+    axis->setTitleText("Nr. of devices");
 
     chart()->setTitle("Working...");
 }

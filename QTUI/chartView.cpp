@@ -41,9 +41,26 @@ chartview::chartview(QWidget *parent) :
     chart()->legend()->markers(m_scatter2)[0]->setVisible(false);
 
     chart()->createDefaultAxes();
-    chart()->axes(Qt::Horizontal).first()->setRange(0, xAxisMax);
-    chart()->axes(Qt::Vertical).first()->setRange(0, yAxisMax);
 
+    // setup xAxis
+    QValueAxis *axis = (QValueAxis *) chart()->axes(Qt::Horizontal).first();
+    axis->setTickType(QValueAxis::TickType::TicksDynamic);
+    axis->setTickAnchor(0);
+    axis->setTickInterval(1);
+    axis->setRange(0, xAxisMax);
+    axis->setTitleText("Distance (m)");
+    axis->setLabelFormat("%d");
+
+    // setup yAxis
+    axis = (QValueAxis *) chart()->axes(Qt::Vertical).first();
+    axis->setTickType(QValueAxis::TickType::TicksDynamic);
+    axis->setTickAnchor(0);
+    axis->setTickInterval(1);
+    axis->setRange(0, yAxisMax);
+    axis->setTitleText("Distance (m)");
+    axis->setLabelFormat("%d");
+
+    // setup chart title
     chart()->setTitle("Localized Devices");
 
     connect(m_scatter, &QScatterSeries::clicked, this, &chartview::handleClickedPoint);
@@ -222,13 +239,15 @@ void chartview::updateChart(time_t beginning, time_t end)
     // update x-Axis max value if needed
     if (xMax > xAxisMax) {
         xAxisMax = xMax;
-        chart()->axes(Qt::Horizontal).first()->setMax(xMax+1);
+        chart()->axes(Qt::Horizontal).first()->setMax(qCeil(xMax+1));
+        ((QValueAxis*) chart()->axes(Qt::Horizontal).first())->setTickCount(qCeil(xMax+1) > 5 ? qCeil(xMax+1) : 5);
     }
 
-    // update x-Axis max value if needed
+    // update y-Axis max value if needed
     if (yMax > yAxisMax) {
         yAxisMax = yMax;
-        chart()->axes(Qt::Vertical).first()->setMax(yMax+1);
+        chart()->axes(Qt::Vertical).first()->setMax(qCeil(yMax+1));
+        ((QValueAxis*) chart()->axes(Qt::Vertical).first())->setTickCount(qCeil(yMax+1) > 5 ? qCeil(yMax+1) : 5);
     }
 
     // update scatter series

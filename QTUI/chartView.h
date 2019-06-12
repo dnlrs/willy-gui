@@ -4,6 +4,7 @@
 #include <QtCharts/QChartGlobal>
 #include <QtCharts/QChartView>
 #include <QtCharts/QScatterSeries>
+#include <QValueAxis>
 #include <QDateTime>
 #include "device.h"
 #include "position.h"
@@ -43,8 +44,8 @@ private:
     // all hidden mac, used for device hidden device matching
     std::vector<position> hiddenCollection;
 
-    double xAxisMax = 1;
-    double yAxisMax = 1;
+    double xAxisMax = 5;
+    double yAxisMax = 5;
 };
 
 #endif // GRAPHICSVIEW_H
