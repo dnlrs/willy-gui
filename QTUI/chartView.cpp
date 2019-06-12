@@ -44,6 +44,8 @@ chartview::chartview(QWidget *parent) :
     chart()->axes(Qt::Horizontal).first()->setRange(0, xAxisMax);
     chart()->axes(Qt::Vertical).first()->setRange(0, yAxisMax);
 
+    chart()->setTitle("Localized Devices");
+
     connect(m_scatter, &QScatterSeries::clicked, this, &chartview::handleClickedPoint);
     connect(m_scatter2, &QScatterSeries::clicked, this, &chartview::handleClickedPoint2);
 }

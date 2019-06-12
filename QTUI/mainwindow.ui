@@ -26,7 +26,7 @@
       <x>210</x>
       <y>20</y>
       <width>911</width>
-      <height>321</height>
+      <height>401</height>
      </rect>
     </property>
    </widget>
@@ -169,40 +169,14 @@
      </rect>
     </property>
    </widget>
-   <widget class="QLabel" name="label_7">
-    <property name="geometry">
-     <rect>
-      <x>210</x>
-      <y>0</y>
-      <width>671</width>
-      <height>16</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Rappresentazione spaziale dei dispositivi rilevati nel periodo di tempo. (I dispositivi sono sempre posizionati sulle ultime coordinate rilevate)</string>
-    </property>
-   </widget>
    <widget class="lastwindow" name="graphicsView">
     <property name="geometry">
      <rect>
       <x>210</x>
-      <y>370</y>
+      <y>430</y>
       <width>911</width>
       <height>321</height>
      </rect>
-    </property>
-   </widget>
-   <widget class="QLabel" name="label_8">
-    <property name="geometry">
-     <rect>
-      <x>210</x>
-      <y>350</y>
-      <width>471</width>
-      <height>16</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Asse x intervalli di 5 minuti. Asse y numero di dispositivi per intervallo</string>
     </property>
    </widget>
    <widget class="QLabel" name="label_5">
