@@ -21,17 +21,18 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     QTextStream out(stdout);
     QDateTime datetime;
-    datetime.setTime_t(time(NULL));
-    statsMode= false;
-    beginning= time(NULL);
-    end= time(NULL);
+    datetime.setTime_t(uint(time(nullptr)));
+    statsMode = false;
+
+    beginning = time(nullptr);
+    end = time(nullptr);
+
     QString s = datetime.toString("yyyy-MM-dd  HH:mm:ss");
     sliderValue=0;
+
     QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE");
-    //db.setHostName("http://localhost/phpmyadmin");
     db.setDatabaseName("../server/database.db");
-    //db.setUserName("");
-    //db.setPassword("");
+
     bool ok = db.open();
     if(!ok){
         out << "not connected" << endl;
@@ -39,39 +40,43 @@ MainWindow::MainWindow(QWidget *parent) :
     else{
         //out << "Connected" << endl;
     }
+
     ui->setupUi(this);
     ui->endTime->setDateTime(datetime);
     ui->startTime->setDateTime(datetime);
     ui->inizio->display(s);
     ui->fine->display(s);
+
     out << QDir::currentPath() << endl;
+
     ui->comboBox->update(this->beginning, this->end);
     timer = new QTimer(this);
-        connect(timer, SIGNAL(timeout()), this, SLOT(update()));
-        timer->start(3000);
+    connect(timer, SIGNAL(timeout()), this, SLOT(update()));
+    timer->start(3000);
 }
 
-void MainWindow::update(){
+void MainWindow::update()
+{
     QDateTime datetime;
-    end= time(NULL);
-    datetime.setTime_t(time(NULL));
+    end = time(nullptr);
+    datetime.setTime_t(uint(time(nullptr)));
     QString s = datetime.toString("yyyy-MM-dd  HH:mm:ss");
-    //ui->lcdNumber->display(s);
+
     ui->fine->display(s);
     ui->chartView->updateChart(beginning, end);
     ui->comboBox->update(beginning, end);
     ui->graphicsView->updateChart(beginning, end);
-
 }
 
-void MainWindow::sliderManagment(int newVal){
+void MainWindow::sliderManagment(int newVal)
+{
     int diff= newVal-sliderValue;
     diff=diff*3000;
     sliderValue=newVal;
-    long long t =  time(NULL);
+    long long t = time(nullptr);
     t= t+diff;
     QDateTime datetime;
-    datetime.setTime_t(t);
+    datetime.setTime_t(uint(t));
     QString s = datetime.toString("yyyy-MM-dd  HH:mm:ss");
     ui->fine->display(s);
 }
@@ -126,15 +131,18 @@ void MainWindow::statistiche()
 {
     timer->stop();
     if( ui->startTime->dateTime().toTime_t() < ui->endTime->dateTime().toTime_t()){
-        beginning= ui->startTime->dateTime().toTime_t();
-        end= ui->endTime->dateTime().toTime_t();
+        beginning = ui->startTime->dateTime().toTime_t();
+        end = ui->endTime->dateTime().toTime_t();
+
         QDateTime datetime;
-        datetime.setTime_t(beginning);
+        datetime.setTime_t(uint(beginning));
         QString s = datetime.toString("yyyy-MM-dd  HH:mm:ss");
         ui->inizio->display(s);
-        datetime.setTime_t(end);
+
+        datetime.setTime_t(uint(end));
         s = datetime.toString("yyyy-MM-dd  HH:mm:ss");
         ui->fine->display(s);
+
         ui->chartView->updateChart(beginning, end);
         ui->comboBox->update(beginning, end);
         ui->graphicsView->updateChart(beginning, end);
@@ -156,9 +164,9 @@ void MainWindow::statistiche()
 void MainWindow::restart()
 {
     QDateTime datetime;
-    datetime.setTime_t(time(NULL));
-    beginning= time(NULL);
-    end= time(NULL);
+    datetime.setTime_t(uint(time(nullptr)));
+    beginning = time(nullptr);
+    end = time(nullptr);
     QString s = datetime.toString("yyyy-MM-dd  HH:mm:ss");
     ui->inizio->display(s);
     ui->fine->display(s);

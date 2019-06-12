@@ -53,12 +53,15 @@ private slots:
     void hhinizio(int);
 
     void hhfine(int);
+
 private:
+
     Ui::MainWindow *ui;
     confwdg wdg;
     logwdg log;
     QProcess* server;
     QTimer *timer;
+
     int sliderValue;
     time_t beginning;
     time_t end;
