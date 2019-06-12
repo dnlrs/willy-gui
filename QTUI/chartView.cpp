@@ -179,19 +179,23 @@ void chartview::updateChart(time_t beginning, time_t end)
     double xMax = 0;
     double yMax = 0;
 
+    // in real time consider only last 3 seconds
+    if (beginning == 0) {
+        beginning = end - 5;
+    }
+
+
     QSqlQuery qry, qry2;
-    position p;
-
     QString query;
-
-    const QString textbeg = QString::number(beginning);
-    const QString textend = QString::number(end);
-
     query = "SELECT mac as outermac, pos_x, pos_y, timestamp "
             "FROM devices "
             "WHERE timestamp = (SELECT MAX(timestamp)"
                                 "FROM devices "
-                                "WHERE mac = outermac AND timestamp <  \"" + textend + "\" AND timestamp >  \"" + textbeg + "\");";
+                                "WHERE mac = outermac AND timestamp <  \"" + QString::number(end) + "\" AND timestamp >  \"" + QString::number(beginning) + "\");";
+
+    // clear positions and hidden positions
+    positions.clear();
+    hiddenPositions.clear();
 
     if (qry.exec(query)) {
 
@@ -209,6 +213,7 @@ void chartview::updateChart(time_t beginning, time_t end)
 
             if (qry2.exec(query)) {
                if(qry2.first()) {
+                    position p;
 
                     p.setHash(qry2.value(0).toString());
                     p.setX(pos_x);
@@ -265,21 +270,12 @@ void chartview::updateChart(time_t beginning, time_t end)
 
     // store all encountered hidden macs
     for( position p : hiddenPositions){
-
-        //if(p.getTimestamp() > end-300){
-        //    hiddenCollection.push_back(p);
-        //}
-
          hiddenCollection.push_back(p);
     }
 
     // backup positions and hidden positions
     positions2 = positions;
     hiddenPositions2 = hiddenPositions;
-
-    // clear positions and hidden positions
-    positions.clear();
-    hiddenPositions.clear();
 }
 
 
