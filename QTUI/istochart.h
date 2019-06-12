@@ -14,7 +14,7 @@ class istochart : public QChartView
     Q_OBJECT
 
 public:
-    istochart(QWidget *parent = 0, QString mac="", time_t beginning=time(NULL), time_t ending=time(NULL));
+    istochart(QWidget *parent = nullptr, QString mac="", time_t beginning=time(nullptr), time_t ending=time(nullptr));
     ~istochart();
 private:
     QLineSeries *m_scatter;

@@ -26,60 +26,49 @@ istochart::istochart(QWidget *parent, QString mac, time_t beg, time_t ending) :
 {
     QSqlQuery qry;
     QString query;
-    int k=0;
-    int n=0;
-    QTextStream out(stdout);
+
     setRenderHint(QPainter::Antialiasing);
-    out << "ISTOCHART CREATO" << endl;
-    //ending = 1557929701;
-    //beg = 1557928733;
-    long long end= ending;
-    long long begg= beg;
-    QVariant qv= end-begg;
+
+    long long end = ending;
+    long long begg = beg;
+
+    QVariant qv = end-begg;
     m_scatter = new QLineSeries;
+
     chart()->addSeries(m_scatter);
     chart()->legend()->markers(m_scatter)[0]->setVisible(false);
+
     chart()->createDefaultAxes();
-    chart()->axisX()->setRange(0, qv);
-    chart()->axisY()->setRange(0, 1);
-    QString start  = QString::number(begg);
+    chart()->axes(Qt::Horizontal).first()->setRange(0, qv);
+    chart()->axes(Qt::Vertical).first()->setRange(0, 1.2);
+
+    QString start = QString::number(begg);
     QString stop  = QString::number(end);
-    QList<QString> timestamp;
-    query= "SELECT * FROM devices WHERE mac=" + mac.mid(6) +" AND timestamp>"+  start + " AND timestamp<"+stop;
+
+    query= "SELECT DISTINCT timestamp "
+           "FROM devices "
+           "WHERE mac=" + mac.mid(6) +" AND timestamp > "+  start + " AND timestamp < " + stop + ";";
     qDebug() << query << "";
-    if (qry.exec(query))
-    {
+
+    QList<long long> timestamp;
+    if (qry.exec(query)) {
         while(qry.next())
-            timestamp.push_back(qry.value(1).toString());
+            timestamp.push_back(qry.value(0).toLongLong());
     }
-    else
-    {
+    else {
         qDebug() << qry.lastError() << query;
     }
-    long diff= end-begg;
-    for(long i=0; i<diff; i++){
-            if(timestamp.contains(QString::number(begg+i)))
-            {
-                //k++;
-                //n++;
-                //if(k==3){
-                 *m_scatter << QPointF( i, 1);
-                //}
-                //if(n==5){
-                 //n=0;
-                 //k=0;
-                //}
-            }
-            else {
-                //n++;
-                //if(n==5){
-                 *m_scatter << QPointF( i, 0);
-                 //n=0;
-                 //k=0;
-                //}
-            }
+
+    *m_scatter << QPointF(0, 0);
+    for (auto ts : timestamp) {
+        *m_scatter << QPointF((ts - begg), 0);
+        *m_scatter << QPointF((ts - begg), 1);
+        *m_scatter << QPointF((ts - begg), 0);
     }
+    *m_scatter << QPointF(end-begg, 0);
+
 }
+
 istochart::~istochart()
 {
 
