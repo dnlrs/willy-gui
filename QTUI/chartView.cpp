@@ -10,6 +10,7 @@
 #include <sstream>
 #include <algorithm>
 #include <utility>
+#include <set>
 #include <QtCharts/QChartGlobal>
 #include <QtCharts/QChartView>
 #include <QtCharts/QScatterSeries>
@@ -230,6 +231,7 @@ void chartview::updateChart(time_t beginning, time_t end){
     hiddenPositions.clear();
 }
 
+
 std::list<std::pair<float, long long>> chartview::probableHiddenMatching( position p, std::vector<position> hiddenCollections){
 
     const static int SSID_WEIGHT = 50;
@@ -237,12 +239,17 @@ std::list<std::pair<float, long long>> chartview::probableHiddenMatching( positi
     const static int SEQ_WEIGHT = 19;
 
     std::list<std::pair<float, long long>> resultList;
+    std::set<long long> consideredMacs;
     float curr_weight;
 
     for(position px : hiddenCollections){
 
         // ignore comparing the device with itself
         if (p.getMac() == px.getMac())
+            continue;
+
+        // ignore macs that have already been considered
+        if (consideredMacs.find(px.getMac()) != consideredMacs.end())
             continue;
 
         curr_weight = 0;
@@ -260,6 +267,8 @@ std::list<std::pair<float, long long>> chartview::probableHiddenMatching( positi
         pai.second = px.getMac();
         pai.first = curr_weight;
         resultList.push_back(pai);
+
+        consideredMacs.insert(pai.second);
     }
     qDebug() << "arrivato";
     return resultList;
