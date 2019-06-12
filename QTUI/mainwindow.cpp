@@ -63,7 +63,7 @@ void MainWindow::update()
     QString s = datetime.toString("yyyy-MM-dd  HH:mm:ss");
 
     ui->fine->display(s);
-    ui->chartView->updateChart(beginning, end);
+    ui->chartView->updateChart(0, end);
     ui->comboBox->update(0, end);
     ui->graphicsView->updateChart(0, end);
 }
@@ -82,6 +82,7 @@ void MainWindow::sliderManagment(int newVal)
 }
 
 void MainWindow::swapMode(){
+    ui->label_16->setText("");
     if(!statsMode){
         ui->label_2->setEnabled(true);
         ui->label_3->setEnabled(true);
@@ -91,7 +92,7 @@ void MainWindow::swapMode(){
         ui->pushButton->setEnabled(true);
         ui->endTime->setEnabled(true);
         //ui->horizontalSlider_2->setEnabled(true);
-        ui->pushButton_2->setText("Disabilità statistiche");
+        ui->pushButton_2->setText("Exit Stats");
         statsMode= true;
     }
     else{
@@ -101,7 +102,7 @@ void MainWindow::swapMode(){
         ui->startTime->setEnabled(false);
         ui->endTime->setEnabled(false);
         ui->pushButton->setEnabled(false);
-        ui->pushButton_2->setText("Abilita statistiche");
+        ui->pushButton_2->setText("Stats");
         ui->pushButton_3->setEnabled(true);
         statsMode= false;
         ui->pushButton_2->setEnabled(true);
@@ -124,6 +125,8 @@ void MainWindow::statistiche()
 {
     timer->stop();
     if( ui->startTime->dateTime().toTime_t() < ui->endTime->dateTime().toTime_t()){
+        ui->label_16->setText("");
+
         beginning = ui->startTime->dateTime().toTime_t();
         end = ui->endTime->dateTime().toTime_t();
 
@@ -144,7 +147,7 @@ void MainWindow::statistiche()
         ui->pushButton_3->setEnabled(false);
     }
     else {
-        ui->label_16->setText("Il datetime di inizio deve essere\n minore di quello di fine.");
+        ui->label_16->setText("Invalid interval.");
     }
 }
 

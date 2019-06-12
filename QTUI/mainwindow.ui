@@ -23,10 +23,10 @@
    <widget class="chartview" name="chartView">
     <property name="geometry">
      <rect>
-      <x>210</x>
+      <x>200</x>
       <y>20</y>
-      <width>911</width>
-      <height>401</height>
+      <width>921</width>
+      <height>461</height>
      </rect>
     </property>
    </widget>
@@ -82,7 +82,7 @@
      </rect>
     </property>
     <property name="text">
-     <string>Datetime inizio cattura:</string>
+     <string>Starting time:</string>
     </property>
    </widget>
    <widget class="QLabel" name="label_2">
@@ -93,12 +93,12 @@
      <rect>
       <x>10</x>
       <y>250</y>
-      <width>191</width>
+      <width>181</width>
       <height>16</height>
      </rect>
     </property>
     <property name="text">
-     <string>DateTime inizio periodo interessato:</string>
+     <string>Start date and time:</string>
     </property>
    </widget>
    <widget class="QLabel" name="label_3">
@@ -114,7 +114,7 @@
      </rect>
     </property>
     <property name="text">
-     <string>DateTime fine periodo interessato:</string>
+     <string>End date and time:</string>
     </property>
    </widget>
    <widget class="QLCDNumber" name="inizio">
@@ -153,7 +153,7 @@
      </rect>
     </property>
     <property name="text">
-     <string>Datetime fine cattura:</string>
+     <string>End time:</string>
     </property>
    </widget>
    <widget class="macstats" name="comboBox">
@@ -172,10 +172,10 @@
    <widget class="lastwindow" name="graphicsView">
     <property name="geometry">
      <rect>
-      <x>210</x>
-      <y>430</y>
-      <width>911</width>
-      <height>321</height>
+      <x>10</x>
+      <y>490</y>
+      <width>1111</width>
+      <height>261</height>
      </rect>
     </property>
    </widget>
@@ -192,20 +192,20 @@
      </rect>
     </property>
     <property name="text">
-     <string>Mac rilevati più volte</string>
+     <string>Most detected devices:</string>
     </property>
    </widget>
    <widget class="QPushButton" name="pushButton_2">
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>210</y>
-      <width>191</width>
+      <y>220</y>
+      <width>181</width>
       <height>23</height>
      </rect>
     </property>
     <property name="text">
-     <string>Modalità statistiche</string>
+     <string>Stats</string>
     </property>
    </widget>
    <widget class="QPushButton" name="pushButton">
@@ -221,13 +221,13 @@
      </rect>
     </property>
     <property name="text">
-     <string>Consulta</string>
+     <string>Update</string>
     </property>
    </widget>
    <widget class="QLabel" name="label_16">
     <property name="geometry">
      <rect>
-      <x>20</x>
+      <x>10</x>
       <y>150</y>
       <width>181</width>
       <height>51</height>
