@@ -97,7 +97,6 @@ void MainWindow::swapMode(){
     else{
         ui->label_2->setEnabled(false);
         ui->label_3->setEnabled(false);
-        ui->label_6->setEnabled(false);
         ui->label_5->setEnabled(false);
         ui->startTime->setEnabled(false);
         ui->endTime->setEnabled(false);
@@ -106,12 +105,6 @@ void MainWindow::swapMode(){
         ui->pushButton_3->setEnabled(true);
         statsMode= false;
         ui->pushButton_2->setEnabled(true);
-        ui->spinBox->setEnabled(false);
-        ui->spinBox_2->setEnabled(false);
-        ui->spinBox_3->setEnabled(false);
-        ui->spinBox_4->setEnabled(false);
-        ui->spinBox_5->setEnabled(false);
-        ui->spinBox_6->setEnabled(false);
     }
 }
 
@@ -149,12 +142,6 @@ void MainWindow::statistiche()
 
         ui->comboBox->setEnabled(true);
         ui->pushButton_3->setEnabled(false);
-        ui->spinBox->setEnabled(true);
-        ui->spinBox_2->setEnabled(true);
-        ui->spinBox_3->setEnabled(true);
-        ui->spinBox_4->setEnabled(true);
-        ui->spinBox_5->setEnabled(true);
-        ui->spinBox_6->setEnabled(true);
     }
     else {
         ui->label_16->setText("Il datetime di inizio deve essere\n minore di quello di fine.");
@@ -187,12 +174,6 @@ void MainWindow::mminizio(int mm)
     else{
         ui->label_16->setText("Inizio periodo precedente\n alla fine.");
     }
-    ui->spinBox->setValue(0);
-    ui->spinBox_2->setValue(0);
-    ui->spinBox_3->setValue(0);
-    ui->spinBox_4->setValue(0);
-    ui->spinBox_5->setValue(0);
-    ui->spinBox_6->setValue(0);
 }
 
 void MainWindow::mmfine(int mm)
@@ -210,13 +191,6 @@ void MainWindow::mmfine(int mm)
     {
         ui->label_16->setText("Inizio precedente\n a fine.");
     }
-    ui->spinBox->setValue(0);
-    ui->spinBox_2->setValue(0);
-    ui->spinBox_3->setValue(0);
-    ui->spinBox_4->setValue(0);
-    ui->spinBox_5->setValue(0);
-    ui->spinBox_6->setValue(0);
-
 }
 
 void MainWindow::gginizio(int gg)
@@ -232,12 +206,6 @@ void MainWindow::gginizio(int gg)
     else {
         ui->label_16->setText("Periodo di inizio precedente\n a fine");
     }
-    ui->spinBox->setValue(0);
-    ui->spinBox_2->setValue(0);
-    ui->spinBox_3->setValue(0);
-    ui->spinBox_4->setValue(0);
-    ui->spinBox_5->setValue(0);
-    ui->spinBox_6->setValue(0);
 }
 
 void MainWindow::ggfine(int gg)
@@ -253,12 +221,6 @@ void MainWindow::ggfine(int gg)
     }else {
         ui->label_16->setText("Periodo di inizio precedente\n a fine.");
     }
-    ui->spinBox->setValue(0);
-    ui->spinBox_2->setValue(0);
-    ui->spinBox_3->setValue(0);
-    ui->spinBox_4->setValue(0);
-    ui->spinBox_5->setValue(0);
-    ui->spinBox_6->setValue(0);
 }
 
 void MainWindow::hhinizio(int hh)
@@ -275,12 +237,6 @@ void MainWindow::hhinizio(int hh)
     else{
         ui->label_16->setText("Periodi inizio precedente\n a periodo fine");
     }
-    ui->spinBox->setValue(0);
-    ui->spinBox_2->setValue(0);
-    ui->spinBox_3->setValue(0);
-    ui->spinBox_4->setValue(0);
-    ui->spinBox_5->setValue(0);
-    ui->spinBox_6->setValue(0);
 }
 
 void MainWindow::hhfine(int hh)
@@ -296,12 +252,6 @@ void MainWindow::hhfine(int hh)
     else{
         ui->label_16->setText("Periodo inizio precedente\n a periodo fine.");
     }
-    ui->spinBox->setValue(0);
-    ui->spinBox_2->setValue(0);
-    ui->spinBox_3->setValue(0);
-    ui->spinBox_4->setValue(0);
-    ui->spinBox_5->setValue(0);
-    ui->spinBox_6->setValue(0);
 }
 
 void MainWindow::statStopChange(QDateTime time){
