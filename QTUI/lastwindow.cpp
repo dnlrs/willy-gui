@@ -36,6 +36,8 @@ lastwindow::lastwindow(QWidget *parent) :
     chart()->createDefaultAxes();
     chart()->axes(Qt::Horizontal).first()->setRange(0, 1);
     chart()->axes(Qt::Vertical).first()->setRange(0, yAxisMax);
+
+    chart()->setTitle("Working...");
 }
 
 void lastwindow::updateChart(time_t start, time_t end)

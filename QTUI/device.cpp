@@ -54,7 +54,8 @@ std::string device::mac2str(long long addr)
     int pos = 17;
     int mac_length = 6;
     for (int byte_index = (mac_length - 1); byte_index >= 0; byte_index--) {
-        uint8_t current_byte = ((char*) &addr)[byte_index];
+        int real_byte_index = (mac_length - 1) - byte_index; // because machine is little endian
+        uint8_t current_byte = ((char*) &addr)[real_byte_index];
         rval[pos--] = ':';
         rval[pos--] = digits[current_byte & 0x0f];
         current_byte >>= 4;
