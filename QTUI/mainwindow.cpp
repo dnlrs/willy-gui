@@ -64,7 +64,7 @@ void MainWindow::update()
 
     ui->fine->display(s);
     ui->chartView->updateChart(beginning, end);
-    ui->comboBox->update(beginning, end);
+    ui->comboBox->update(0, end);
     ui->graphicsView->updateChart(0, end);
 }
 
