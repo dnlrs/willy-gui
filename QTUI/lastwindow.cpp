@@ -31,8 +31,8 @@ lastwindow::lastwindow(QWidget *parent) :
     setRenderHint(QPainter::Antialiasing);
     QSqlQuery qry;
     chart()->createDefaultAxes();
-    chart()->axisX()->setRange(0, 200); //todo inserire costante giusta
-    chart()->axisY()->setRange(0, 200);
+    chart()->axisX()->setRange(0, 1); //todo inserire costante giusta
+    chart()->axisY()->setRange(0, 1);
     //connect(m_scatter, &QScatterSeries::clicked, this, &chartview::handleClickedPoint);
 }
 
@@ -98,6 +98,14 @@ void lastwindow::updateChart(time_t beginning, time_t end){
        }
        //qDebug() << Iter.key() << Iter.value();
     }
+
+    int max=0;
+        for(int i=0; i<intervals.size(); i++){
+            if(max<numsDevices[i]){
+                max=numsDevices[i];
+            }
+        }
+        chart()->axisY()->setRange(0, max);
 
     for(int i=0; i<intervals.size(); i++){
         *m_scatter << QPointF( i, numsDevices[i]);
