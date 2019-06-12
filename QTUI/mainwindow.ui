@@ -507,7 +507,7 @@
      <x>0</x>
      <y>0</y>
      <width>1125</width>
-     <height>21</height>
+     <height>26</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuPacketViewer">
@@ -516,12 +516,6 @@
     </property>
     <addaction name="actionExit"/>
    </widget>
-   <widget class="QMenu" name="menuConfig">
-    <property name="title">
-     <string>Config</string>
-    </property>
-    <addaction name="actionConfiguration"/>
-   </widget>
    <widget class="QMenu" name="menuLog">
     <property name="title">
      <string>Log</string>
@@ -529,7 +523,6 @@
     <addaction name="actionShow_Logs"/>
    </widget>
    <addaction name="menuPacketViewer"/>
-   <addaction name="menuConfig"/>
    <addaction name="menuLog"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
