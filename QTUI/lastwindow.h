@@ -4,6 +4,7 @@
 #include <QtCharts/QChartGlobal>
 #include <QtCharts/QChartView>
 #include <QtCharts/QScatterSeries>
+#include <QAreaSeries>
 #include <QDateTime>
 #include "device.h"
 #include "position.h"
@@ -23,8 +24,16 @@ public Q_SLOTS:
     void updateChart(time_t, time_t);
 
 private:
-    QLineSeries *m_scatter;
+    QLineSeries *top_series = nullptr;
+    QLineSeries *bottom_series = nullptr;
 
+    QAreaSeries *series = nullptr;
+
+    int yAxisMax = 1;
+
+    QString title;
+
+    unsigned long long interval_width = 3; // seconds
 };
 
 #endif // LASTWINDOW_H

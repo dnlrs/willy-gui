@@ -7,11 +7,11 @@
 #include <QtCore/QString>
 #include <QLegendMarker>
 #include <time.h>
-#include <sstream>
+#include <string>
 #include <QtCharts/QChartGlobal>
 #include <QtCharts/QChartView>
 #include <QtCharts/QScatterSeries>
-#include <vector>
+#include <QVector>
 #include <QMap>
 #include <QTextStream>
 #include <QLabel>
@@ -24,90 +24,95 @@ QT_CHARTS_USE_NAMESPACE
 lastwindow::lastwindow(QWidget *parent) :
     QChartView(parent)
 {
-    m_scatter = new QLineSeries;
-    chart()->addSeries(m_scatter);
-    chart()->legend()->markers(m_scatter)[0]->setVisible(false);
-    QTextStream out(stdout);
+    top_series = new QLineSeries();
+    bottom_series = new QLineSeries();
+    series = new QAreaSeries(top_series, bottom_series);
+
+    chart()->addSeries(series);
+    chart()->legend()->markers(series)[0]->setVisible(false);
+
     setRenderHint(QPainter::Antialiasing);
-    QSqlQuery qry;
+
     chart()->createDefaultAxes();
-    chart()->axisX()->setRange(0, 1); //todo inserire costante giusta
-    chart()->axisY()->setRange(0, 1);
-    //connect(m_scatter, &QScatterSeries::clicked, this, &chartview::handleClickedPoint);
+    chart()->axes(Qt::Horizontal).first()->setRange(0, 1);
+    chart()->axes(Qt::Vertical).first()->setRange(0, yAxisMax);
 }
 
-void lastwindow::updateChart(time_t beginning, time_t end){
-    m_scatter -> clear();
-    int intervalnum=(end-beginning)/300;
-    chart()->axisX()->setRange(0, intervalnum);
+void lastwindow::updateChart(time_t start, time_t end)
+{
+    // consider only last 5 minutes
+    if (start == 0) {
+        start = end - 5*60;
+    }
+
+    unsigned long long intervalNum = (end-start) / interval_width;
+    chart()->axes(Qt::Horizontal).first()->setRange(0, intervalNum + 1);
+
+    qDebug("beginning is : %u", start);
+    qDebug("end is : %u", end);
+    qDebug("interval num is: %u", intervalNum);
+
+    QVector<int> devicesCount;
+    devicesCount.resize(int(intervalNum + 1));
+
+    qDebug("vector size is %d", devicesCount.size());
+
+    // read from DB the number of distinc mac for each interval
     QSqlQuery qry;
-    QMap<QString, QList<time_t>> macsTimes;
-    QTextStream out(stdout);
-    QString query;
-    QList<time_t> intervals;
-    QList<int> numsDevices;
-    for(int i=0; i<intervalnum; i++){
-        intervals.insert(1000, (beginning+300*i));
-        numsDevices.insert(1000,0);
+    QString query = "SELECT timestamp, COUNT(DISTINCT mac) "
+                    "FROM devices "
+                    "WHERE timestamp < \"" +QString::number(end) + "\" AND timestamp >\"" + QString::number(start) + "\" "
+                    "GROUP BY timestamp;";
+
+    if (qry.exec(query)) {
+        while (qry.next()) {
+            unsigned long long timestamp = qry.value(0).toULongLong();
+            int devices = qry.value(1).toInt();
+
+            int interval = int((timestamp - start) / interval_width);
+            qDebug("interval from db is: %u", interval);
+            devicesCount[interval] += devices;
+        }
     }
-    query="SELECT * FROM devices WHERE timestamp<" +QString::number(end) + " AND timestamp>" + QString::number(beginning);
-    qDebug() <<  "\t" << query;
-    if (qry.exec(query))
-    {
-       while(qry.next())
-       {
-           if(macsTimes.contains(qry.value(0).toString())){
-               macsTimes.find(qry.value(0).toString())->insert(1000, qry.value(1).toLongLong());
-           }
-           else {
-               QList<time_t> tmp;
-               tmp.insert(0,qry.value(1).toLongLong());
-               macsTimes.insert(qry.value(0).toString(), tmp);
-           }
-       }
-    }
-    else
-    {
+    else {
         qDebug() << qry.lastError()<< "\t" << query;
     }
-    QMapIterator<QString, QList<time_t>> itermap(macsTimes);
-    for(int j=0; j<intervals.size(); j++){
-        numsDevices[j]=0;
-    }
-    while(itermap.hasNext())
-    {
-       int lastInterval=-1;
-       itermap.next();
-       bool found=false;
-       QList<time_t> tmptimes= itermap.value();
-       int k=0;
-       for(int i=0; i<tmptimes.size(); i++){
-           for(int j=0; j<(intervals.size()-1); j++){
-               if(tmptimes[i]>intervals[j] && tmptimes[i]<intervals[j+1]){
-                   if(j+1!=lastInterval){
-                            lastInterval=j+1;
-                            numsDevices[j+1]++;
-                   }
-                   found=true;
-               }
-               if(found){
-                   found=false;
-                   break;
-               }
-           }
-       }
-       //qDebug() << Iter.key() << Iter.value();
-    }
 
-    int max=0;
-        for(int i=0; i<intervals.size(); i++){
-            if(max<numsDevices[i]){
-                max=numsDevices[i];
-            }
+    // read from DB the total number of distinct devices
+    // within all considered intervals
+    int totalDevicesNum = 0;
+    query = "SELECT COUNT(DISTINCT mac)"
+            "FROM devices "
+            "WHERE timestamp < \"" +QString::number(end) + "\" AND timestamp >\"" + QString::number(start) + "\";";
+
+    if (qry.exec(query)) {
+        if (qry.next()) {
+            totalDevicesNum = qry.value(0).toInt();
         }
-        chart()->axisY()->setRange(0, max);
-
-    for(int i=0; i<intervals.size(); i++){
-        *m_scatter << QPointF( i, numsDevices[i]);
     }
+    else {
+        qDebug() << qry.lastError()<< "\t" << query;
+    }
+
+    top_series->clear();
+    for (int i = 0; i < int(intervalNum); i++) {
+        qDebug("i is %d", i);
+        *top_series << QPointF(i, 0)
+                    << QPointF(i, devicesCount[i])
+                    << QPointF(i+1, devicesCount[i])
+                    << QPointF(i+1, 0);
+
+        if (devicesCount[i] >= yAxisMax) {
+            yAxisMax = devicesCount[i];
+            chart()->axes(Qt::Vertical).first()->setMax(yAxisMax + 1);
+        }
+    }
+
+    bottom_series->clear();
+    *bottom_series << QPointF(0, 0) << QPointF((intervalNum + 1), 0);
+    chart()->axes(Qt::Horizontal).first()->setMax(intervalNum);
+
+    // update tooltip
+    chart()->setTitle("Total number of devices: " + QString::number(totalDevicesNum));
+
 }
