@@ -16,7 +16,7 @@ public:
 
 public slots:
     void update(time_t start, time_t end);
-    void showItemStat(const QString & text);
+    void showItemStat(int index);
 
 private:
     QMainWindow *win = new QMainWindow(this);

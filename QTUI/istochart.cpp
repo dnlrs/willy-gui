@@ -21,7 +21,7 @@
 
 QT_CHARTS_USE_NAMESPACE
 
-istochart::istochart(QWidget *parent, QString mac, time_t beg, time_t ending) :
+istochart::istochart(QWidget *parent, long long mac_id, QString mac, time_t beg, time_t ending) :
     QChartView(parent)
 {
     QSqlQuery qry;
@@ -42,13 +42,14 @@ istochart::istochart(QWidget *parent, QString mac, time_t beg, time_t ending) :
     chart()->axes(Qt::Horizontal).first()->setRange(0, qv);
     chart()->axes(Qt::Vertical).first()->setRange(0, 1.2);
 
+    chart()->setTitle(mac);
+
     QString start = QString::number(begg);
     QString stop  = QString::number(end);
 
     query= "SELECT DISTINCT timestamp "
            "FROM devices "
-           "WHERE mac=" + mac.mid(6) +" AND timestamp > "+  start + " AND timestamp < " + stop + ";";
-    qDebug() << query << "";
+           "WHERE mac = \"" + QString::number(mac_id) + "\" AND timestamp > \""+  start + "\" AND timestamp < \"" + stop + "\";";
 
     QList<long long> timestamp;
     if (qry.exec(query)) {
@@ -56,7 +57,7 @@ istochart::istochart(QWidget *parent, QString mac, time_t beg, time_t ending) :
             timestamp.push_back(qry.value(0).toLongLong());
     }
     else {
-        qDebug() << qry.lastError() << query;
+        qDebug() << qry.lastError() << "in istoChart::istoChart";
     }
 
     *m_scatter << QPointF(0, 0);
