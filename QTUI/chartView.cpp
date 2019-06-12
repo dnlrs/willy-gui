@@ -219,7 +219,8 @@ void chartview::updateChart(time_t beginning, time_t end)
                     p.setTimestamp(qry2.value(6).toULongLong());
                     p.setSequence_number(qry2.value(5).toInt());
 
-                    if(p.getMac() & (1 << 1)) {
+                    long long mac = p.getMac();
+                    if(((char*) &mac)[5] & (1 << 1)) {
                         hiddenPositions.push_back(p);
                     }
                     else {
