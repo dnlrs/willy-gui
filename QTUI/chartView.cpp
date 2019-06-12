@@ -14,6 +14,7 @@
 #include <QtCharts/QChartGlobal>
 #include <QtCharts/QChartView>
 #include <QtCharts/QScatterSeries>
+#include <QtCharts/QValueAxis>
 #include <vector>
 #include <QTextStream>
 #include <QLabel>
@@ -26,45 +27,23 @@ QT_CHARTS_USE_NAMESPACE
 chartview::chartview(QWidget *parent) :
     QChartView(parent)
 {
-    QTextStream out(stdout);
-    double maxX=0;
-    double maxY=0;
     device dev;
     setRenderHint(QPainter::Antialiasing);
-    QSqlQuery qry;
-    if (qry.exec("SELECT * FROM devices"))
-    {
-       while(qry.next())
-       {
-           dev.setX(qry.value(2).toDouble());
-           dev.setId(qry.value(0).toLongLong());
-           dev.setY(qry.value(3).toDouble());
-           devices.push_back(dev);
-       }
-    }
-    else
-    {
-        qDebug() << qry.lastError();
-    }
-    qDebug() << "costruito";
-    for(device d : devices){
-        if(d.getX()>maxX){
-            maxX=d.getX();
-        }
-        if(d.getY()>maxY){
-            maxY=d.getY();
-        }
-    }
+
     m_scatter = new QScatterSeries();
     m_scatter2 = new QScatterSeries();
     m_scatter2->setColor("red");
+
     chart()->addSeries(m_scatter);
     chart()->addSeries(m_scatter2);
+
     chart()->legend()->markers(m_scatter)[0]->setVisible(false);
     chart()->legend()->markers(m_scatter2)[0]->setVisible(false);
+
     chart()->createDefaultAxes();
-    chart()->axisX()->setRange(-1, maxX+1); //todo inserire costante giusta
-    chart()->axisY()->setRange(-1, maxY+1);
+    chart()->axes(Qt::Horizontal).first()->setRange(0, xAxisMax);
+    chart()->axes(Qt::Vertical).first()->setRange(0, yAxisMax);
+
     connect(m_scatter, &QScatterSeries::clicked, this, &chartview::handleClickedPoint);
     connect(m_scatter2, &QScatterSeries::clicked, this, &chartview::handleClickedPoint2);
 }
@@ -72,10 +51,11 @@ chartview::chartview(QWidget *parent) :
 void chartview::handleClickedPoint(const QPointF &point)
 {
     QPointF clickedPoint = point;
-    QSqlQuery qry;
+
     // Find the closest point from series 1
     QPointF closest(INT_MAX, INT_MAX);
     qreal distance(INT_MAX);
+
     const auto points = m_scatter->points();
     for (const QPointF &currentPoint : points) {
         qreal currentDistance = qSqrt((currentPoint.x() - clickedPoint.x())
@@ -87,8 +67,10 @@ void chartview::handleClickedPoint(const QPointF &point)
             closest = currentPoint;
         }
     }
+
     QWidget *wdg = new QWidget;
     wdg->resize(400,300);
+
     QLabel *label= new QLabel(wdg);
     for(position p : positions2){
         if( abs(p.getX() - closest.x()) < 0.001 && abs(p.getY() - closest.y()) < 0.001){
@@ -113,10 +95,11 @@ void chartview::handleClickedPoint(const QPointF &point)
 void chartview::handleClickedPoint2(const QPointF &point)
 {
     QPointF clickedPoint = point;
-    QSqlQuery qry;
+
     // Find the closest point from series 1
     QPointF closest(INT_MAX, INT_MAX);
     qreal distance(INT_MAX);
+
     const auto points = m_scatter2->points();
     for (const QPointF &currentPoint : points) {
         qreal currentDistance = qSqrt((currentPoint.x() - clickedPoint.x())
@@ -128,14 +111,17 @@ void chartview::handleClickedPoint2(const QPointF &point)
             closest = currentPoint;
         }
     }
+
     QWidget *wdg = new QWidget;
     wdg->resize(400,300);
+
     QLabel *label= new QLabel(wdg);
     for(position p : hiddenPositions2){
         if(abs(p.getX() - closest.x()) < 0.001 && abs(p.getY() - closest.y()) < 0.001){
             QDateTime datetime;
             datetime.setTime_t(uint(p.getTimestamp()));
             QString s = datetime.toString("yyyy-MM-dd  HH:mm:ss");
+
             std::list<std::pair<float, long long>> probableMatching;
             probableMatching = chartview::probableHiddenMatching(p, hiddenCollection);
             
@@ -143,13 +129,16 @@ void chartview::handleClickedPoint2(const QPointF &point)
             probableMatching.sort([](const std::pair<float, long long>& p1, const std::pair<float, long long>& p2) -> bool {
                 return (p1.first > p2.first);
             });
+
             size_t n = 3;
             auto listEnd= std::next(probableMatching.begin(), std::min(n, probableMatching.size()));
             std::list<std::pair<float, long long>> max3(probableMatching.begin(), listEnd);
+
             QString myString = "";
             for(std::pair<float, long long> pai : max3){
                 myString+= QString::fromStdString(device::mac2str(pai.second)) +": "+QString::number(pai.first) +"%\n";
             }
+
             label->setText("MAC: "+QString::fromStdString(device::mac2str(p.getMac())) +"\n"
                            "X: "+ QString::number(p.getX()) +"\n"
                            "Y: "+ QString::number(p.getY()) +"\n"
@@ -157,7 +146,8 @@ void chartview::handleClickedPoint2(const QPointF &point)
                            "SSID: "+ p.getSsid() +"\n"
                            "TIMESTAMP: "+ s +"\n"
                            "SEQUENCE NUMBER: "+ QString::number(p.getSequence_number()) +"\n"
-                           "-*-*-*-*-*-*-*-PROBLABLE MATCHING-*-*-*-*-*-*-*-\n"+myString
+                           "-*-*-*-*-*-*-*-PROBLABLE MATCHING-*-*-*-*-*-*-*-\n"
+                           + myString
                            );
         }
     }
@@ -165,15 +155,16 @@ void chartview::handleClickedPoint2(const QPointF &point)
     wdg->show();
 }
 
-void chartview::updateChart(time_t beginning, time_t end){
+void chartview::updateChart(time_t beginning, time_t end)
+{
+    double xMax = 0;
+    double yMax = 0;
 
-    m_scatter->clear();
-    m_scatter2 -> clear();
+
 
     QSqlQuery qry, qry2;
     position p;
 
-    QTextStream out(stdout);
     QString query;
 
     const QString textbeg = QString::number(beginning);
@@ -186,61 +177,89 @@ void chartview::updateChart(time_t beginning, time_t end){
           "HAVING MAX(timestamp);";
 
     qDebug() <<  "\t" << query;
-    if (qry.exec(query))
-    {
-       while(qry.next())
-       {
+
+    if (qry.exec(query)) {
+
+       while(qry.next()) {
+           double pos_x = qry.value(1).toDouble();
+           double pos_y = qry.value(2).toDouble();
+
+            // update axis max values
+           if (pos_x > xMax) xMax = pos_x;
+           if (pos_y > yMax) yMax = pos_y;
+
             query="SELECT * "
                   "FROM packets "
                   "WHERE mac = \"" + qry.value(0).toString() + "\" AND timestamp = \"" + qry.value(3).toString() + "\";";
 
-            if (qry2.exec(query))
-            {
-               qDebug() << "ENTRATO";
-               if(qry2.first())
-               {
+            if (qry2.exec(query)) {
+               if(qry2.first()) {
+
                     p.setHash(qry2.value(0).toString());
-                    p.setX(qry.value(1).toFloat());
-                    p.setY(qry.value(2).toFloat());
+                    p.setX(pos_x);
+                    p.setY(pos_y);
                     p.setRssi(qry2.value(2).toInt());
                     p.setSsid(qry2.value(1).toString());
                     p.setMac(qry2.value(3).toLongLong());
-                    p.setTimestamp(qry2.value(6).toInt());
+                    p.setTimestamp(qry2.value(6).toULongLong());
                     p.setSequence_number(qry2.value(5).toInt());
 
-                    if(p.getMac() & (1 << 1)){
+                    if(p.getMac() & (1 << 1)) {
                         hiddenPositions.push_back(p);
                     }
-                    else
+                    else {
                         positions.push_back(p);
+                    }
                 }
             }
-            else
-            {
+            else {
                 qDebug() << qry2.lastError() << "\t" << query;
             }
        }
     }
-    else
-    {
+    else {
         qDebug() << qry.lastError()<< "\t" << query;
     }
 
+    // update x-Axis max value if needed
+    if (xMax > xAxisMax) {
+        xAxisMax = xMax;
+        chart()->axes(Qt::Horizontal).first()->setMax(xMax+1);
+    }
+
+    // update x-Axis max value if needed
+    if (yMax > yAxisMax) {
+        yAxisMax = yMax;
+        chart()->axes(Qt::Vertical).first()->setMax(yMax+1);
+    }
+
+    // update scatter series
+    m_scatter->clear();
     for(position p : positions){
         *m_scatter << QPointF( p.position::getX(), p.position::getY());
     }
 
+    // update hidden scatter series
+    m_scatter2->clear();
     for(position p : hiddenPositions){
         *m_scatter2 << QPointF( p.position::getX(), p.position::getY());
     }
-    positions2 = positions;
-    hiddenPositions2 = hiddenPositions;
+
+    // store all encountered hidden macs
     for( position p : hiddenPositions){
-        /*if(p.getTimestamp() > end-300){
-            hiddenCollection.push_back(p);
-        }*/
+
+        //if(p.getTimestamp() > end-300){
+        //    hiddenCollection.push_back(p);
+        //}
+
          hiddenCollection.push_back(p);
     }
+
+    // backup positions and hidden positions
+    positions2 = positions;
+    hiddenPositions2 = hiddenPositions;
+
+    // clear positions and hidden positions
     positions.clear();
     hiddenPositions.clear();
 }

@@ -16,7 +16,7 @@ class chartview : public QChartView
     Q_OBJECT
 
 public:
-    chartview(QWidget *parent = 0);
+    chartview(QWidget *parent = nullptr);
     ~chartview();
     std::list<std::pair<float, long long>> probableHiddenMatching(position, std::vector<position>);
 
@@ -28,12 +28,23 @@ public Q_SLOTS:
 private:
     QScatterSeries *m_scatter;
     QScatterSeries *m_scatter2;
+
     std::vector<device> devices;
+
+    // usd when updating chart then cleared
     std::vector<position> positions;
-    std::vector<position> hiddenCollection;
-    std::vector<position> positions2;
     std::vector<position> hiddenPositions;
+
+    // backup of positions and hiddenPositions,
+    // used for retrieving labels' data
+    std::vector<position> positions2;
     std::vector<position> hiddenPositions2;
+
+    // all hidden mac, used for device hidden device matching
+    std::vector<position> hiddenCollection;
+
+    double xAxisMax = 1;
+    double yAxisMax = 1;
 };
 
 #endif // GRAPHICSVIEW_H
