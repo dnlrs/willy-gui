@@ -241,6 +241,10 @@ std::list<std::pair<float, long long>> chartview::probableHiddenMatching( positi
 
     for(position px : hiddenCollections){
 
+        // ignore comparing the device with itself
+        if (p.getMac() == px.getMac())
+            continue;
+
         curr_weight = 0;
         if(!p.getSsid().isEmpty() && p.getSsid() == px.getSsid()){
             curr_weight += SSID_WEIGHT;
