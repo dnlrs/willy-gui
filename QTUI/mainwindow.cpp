@@ -65,7 +65,7 @@ void MainWindow::update()
     ui->fine->display(s);
     ui->chartView->updateChart(beginning, end);
     ui->comboBox->update(beginning, end);
-    ui->graphicsView->updateChart(beginning, end);
+    ui->graphicsView->updateChart(0, end);
 }
 
 void MainWindow::sliderManagment(int newVal)
