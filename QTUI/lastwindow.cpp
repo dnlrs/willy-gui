@@ -42,9 +42,9 @@ lastwindow::lastwindow(QWidget *parent) :
 
 void lastwindow::updateChart(time_t start, time_t end)
 {
-    // consider only last 5 minutes
+    // in real time consider only last 5 minutes
     if (start == 0) {
-        start = end - 5*60;
+        start = end - (5*60);
     }
 
     unsigned long long intervalNum = (end-start) / interval_width;
@@ -70,7 +70,7 @@ void lastwindow::updateChart(time_t start, time_t end)
         }
     }
     else {
-        qDebug() << qry.lastError()<< "\t" << query;
+        qDebug() << qry.lastError() << "in lastwindow::updateChart, first query";
     }
 
     // read from DB the total number of distinct devices
@@ -86,7 +86,7 @@ void lastwindow::updateChart(time_t start, time_t end)
         }
     }
     else {
-        qDebug() << qry.lastError()<< "\t" << query;
+        qDebug() << qry.lastError() << "in lastwindow::updateChart, second query";
     }
 
     top_series->clear();
