@@ -245,7 +245,7 @@ void chartview::updateChart(time_t beginning, time_t end){
 }
 
 
-std::list<std::pair<float, long long>> chartview::probableHiddenMatching( position p, std::vector<position> hiddenCollections){
+std::list<std::pair<float, long long>> chartview::probableHiddenMatching( position p, std::vector<position>& hiddenCollections){
 
     const static int SSID_WEIGHT = 50;
     const static int POS_WEIGHT = 30;
@@ -254,12 +254,19 @@ std::list<std::pair<float, long long>> chartview::probableHiddenMatching( positi
     std::list<std::pair<float, long long>> resultList;
     std::set<long long> consideredMacs;
     float curr_weight;
+    std::set<int> already_compared;
 
     for(position px : hiddenCollections){
 
         // ignore comparing the device with itself
         if (p.getMac() == px.getMac())
             continue;
+        // if already compared avoid duplicate comparison
+        if(already_compared.find(px.getMac()) == already_compared.end())
+            continue;
+        // insert this mac in the set
+        already_compared.insert(px.getMac());
+
 
         // ignore macs that have already been considered
         if (consideredMacs.find(px.getMac()) != consideredMacs.end())
