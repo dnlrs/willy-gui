@@ -27,11 +27,18 @@ istochart::istochart(QWidget *parent, long long mac_id, QString mac, time_t beg,
 {
     QSqlQuery qry;
     QString query;
-
+    int lastInterval=0;
+    QList<long long> intervals;
+    int intervalsNum=0;
     setRenderHint(QPainter::Antialiasing);
 
     long long end = ending;
     long long begg = beg;
+    long long diff = (end-begg)/30;
+    for(int i=0; i<diff; i++){
+        intervalsNum++;
+        intervals.push_back(begg+(i*30));
+    }
 
     QVariant qv = end-begg;
     m_scatter = new QLineSeries;
@@ -55,7 +62,7 @@ istochart::istochart(QWidget *parent, long long mac_id, QString mac, time_t beg,
 
     query= "SELECT DISTINCT timestamp "
            "FROM devices "
-           "WHERE mac = \"" + QString::number(mac_id) + "\" AND timestamp > \""+  start + "\" AND timestamp < \"" + stop + "\";";
+           "WHERE mac = \"" + QString::number(mac_id) + "\" AND timestamp > \""+  start + "\" AND timestamp < \"" + stop + "\" ORDER BY timestamp;";
 
     QList<long long> timestamp;
     if (qry.exec(query)) {
@@ -67,10 +74,30 @@ istochart::istochart(QWidget *parent, long long mac_id, QString mac, time_t beg,
     }
 
     *m_scatter << QPointF(0, 0);
+    int i=0;
+    QList<bool> present;
+    for(long long interval : intervals){
+        present.push_back(false);
+    }
     for (auto ts : timestamp) {
-        *m_scatter << QPointF((ts - begg), 0);
-        *m_scatter << QPointF((ts - begg), 1);
-        *m_scatter << QPointF((ts - begg), 0);
+        if(ts<intervals[lastInterval]){
+            if(!present[lastInterval]){
+                *m_scatter << QPointF((ts - begg), 0);
+                *m_scatter << QPointF((ts - begg), 1);
+                *m_scatter << QPointF((ts - begg), 0);
+                present.replace(lastInterval, true);
+            }
+        }
+        else{
+            present.replace(lastInterval, false);
+            while(ts>intervals[lastInterval]){
+                lastInterval++;
+            }
+            *m_scatter << QPointF((ts - begg), 0);
+            *m_scatter << QPointF((ts - begg), 1);
+            *m_scatter << QPointF((ts - begg), 0);
+            present.replace(lastInterval, true);
+        }
     }
     *m_scatter << QPointF(end-begg, 0);
 
