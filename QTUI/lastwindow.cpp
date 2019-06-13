@@ -105,6 +105,10 @@ void lastwindow::updateChart(time_t start, time_t end)
 
     top_series->clear();
     for (int i = 0; i < int(intervalNum); i++) {
+        // jump over empyy intervals
+        if (devicesCount[i] == 0)
+            continue;
+
         *top_series << QPointF(i, 0)
                     << QPointF(i, devicesCount[i])
                     << QPointF(i+1, devicesCount[i])
