@@ -17,9 +17,7 @@ x64
 build-Application-Desktop_Qt_5_*/
 *.autosave
 
-#ignore server exe folder
-server/
-
+# ignore building folders
 [Dd]ebug
 [Rr]elease
 [Bb]in
@@ -27,4 +25,3 @@ server/
 [Ll]og
 
 Debug/
-config/
